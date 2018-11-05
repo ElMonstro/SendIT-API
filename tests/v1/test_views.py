@@ -19,7 +19,7 @@ class GoodRequest(ParcelsTestCase):
 
     def test_create_order(self):
         """Tests POST /parcels"""
-        response = self.client.post('/api/v1/orders',
+        response = self.client.post('/api/v1/parcels',
                     data=json.dumps(self.order), content_type='application/json')
         self.assertEqual(response.status_code, 201)
 
