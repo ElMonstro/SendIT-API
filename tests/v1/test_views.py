@@ -82,7 +82,10 @@ class BadRequest(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'No Parcel delivery order with that id'})
         self.assertEqual(response.status_code, 400)
-        
+        response = self.client.get('api/v1/parcels/24034u')
+        data = json.loads(response.data)
+        self.assertEqual(data, {'message': 'Wrong id format'})
+        self.assertEqual(response.status_code, 400)
 
 
 
