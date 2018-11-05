@@ -33,4 +33,33 @@ orders = {
 }
 
 
+class Parcels(Resource):
+    def get(self):
+        return '' 
+    
+    def post(self):
+        return ''
+
+class Parcel(Resource):
+    def get(self, id):
+        return ''
+    
+    def put(self, id):
+        return ''
+
+class UserParcels(Resource):
+    def get(self, id):
+        return ''
+
+
+class CancelOrder(Resource):
+    def put(self, id):
+        return ''
+
+
+api.add_resource(Parcels, '/parcels')
+api.add_resource(Parcel, '/parcels/<id>')
+api.add_resource(UserParcels, '/<id>/parcels')
+api.add_resource(CancelOrder, '/parcel/<id>/cancel')
+
 
