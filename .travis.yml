@@ -1,7 +1,7 @@
 language: 
       - "python"
 env:
-  - CODECOV_TOKEN="spY2augduYHaBh8u91GfCQ"
+  - CODECOV_TOKEN="bae1d058-97bf-4d5e-8d8e-e3ecc89f4c22"
 python:
       - "3.6"
 
