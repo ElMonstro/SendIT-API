@@ -5,6 +5,11 @@ from flask_restful  import Api, Resource
 v1 = Blueprint('v1', __name__, url_prefix='/api/v1')
 api = Api(v1)
 
+# Order statuses
+canceled = 'Canceled'
+delivered = 'Delivered'
+
+# Dummy orders
 orders = {
     321: ['532', '4 5345 343', '4 5343 343', 5, 'In-transit'],
     453: ['352', '4 5435 324', '6 5356 353', 3, 'Delivered'],
@@ -50,12 +55,15 @@ class Parcels(Resource):
 class Parcel(Resource):
     def get(self, id):
         try:
-            if int(id) in orders.keys():
-                return {'order': {str(id): orders[int(id)]}}
-            else: 
-                return {'message': 'No Parcel delivery order with that id'}, 400
+            int_id = int(id)
         except:
             return {'message': 'Wrong id format'}, 400
+
+        if int_id in orders.keys():
+            return {'order': {str(id): orders[int_id]}}
+        else: 
+            return {'message': 'No Parcel delivery order with that id'}, 400
+        
     
     def put(self, id):
         return ''
@@ -67,12 +75,21 @@ class UserParcels(Resource):
 
 class CancelOrder(Resource):
     def put(self, id):
-        return ''
+        try:
+            int_id = int(id)
+        except:
+            return {'message': 'Wrong id format'}, 400
+
+        if int_id in orders.keys():
+            orders[int_id][4] = canceled
+            return 204
+        else:       
+            return {'message': 'No Parcel delivery order with that id'}, 400
 
 
 api.add_resource(Parcels, '/parcels')
 api.add_resource(Parcel, '/parcels/<id>')
-api.add_resource(UserParcels, 'users/<id>/parcels')
-api.add_resource(CancelOrder, '/parcel/<id>/cancel')
+api.add_resource(UserParcels, '/users/<id>/parcels')
+api.add_resource(CancelOrder, '/parcels/<id>/cancel')
 
 
