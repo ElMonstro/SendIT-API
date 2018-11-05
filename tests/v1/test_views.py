@@ -2,11 +2,17 @@ import unittest
 from run import app
 import json
 
+order = {'order': ['532', '4 5345 343', '4 5343 343', 5, 'In-transit']}
+
 class ParcelsTestCase(unittest.TestCase):
     """Parent Testcase class"""
     def setUp(self):
         """Sets up test variables"""
-        pass
+        self.app = app
+        self.client = self.app.test_client(self)
+        self.app.testing = True
+        self.order = order
+
 
 class KnownValues(ParcelsTestCase):
     """This class tests views with valid requests"""
