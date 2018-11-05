@@ -42,21 +42,27 @@ class GoodRequest(ParcelsTestCase):
 
 class BadRequest(ParcelsTestCase):
     """This class tests views with invalid requests"""
-    def test_create_order(self):
-        """Tests POST /parcels"""
-        pass
+   # def test_create_order(self):
+    #    """Tests bad requests with POST /parcels"""
+    #    pass
 
     def test_cancel_order(self):
-        """Tests PUT /parcels/<id>/cancel"""
-        pass
+        """Tests bad requests with PUT /parcels/<id>/cancel"""
+        response = self.client.put('/parcels/35240/cancel') # Wrong parcel id
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {'message': 'No order with that id'})
+        
 
-    def test_get_all_orders(self):
-        """Tests GET /parcels"""
-        pass
+    # def test_get_all_orders(self):
+      #  """Tests bad requests with GET /parcels"""
+       # pass
 
     def test_get_all_orders_by_user(self):
-        """Tests GET /users/<id>/parcels"""
-        pass
+        """Tests bad requests with GET /users/<id>/parcels"""
+        response = self.client.get('/users/35053/parcels')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {'message': 'No user with that order id'})
+        
 
 
 
