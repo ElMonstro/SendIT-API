@@ -49,10 +49,13 @@ class Parcels(Resource):
 
 class Parcel(Resource):
     def get(self, id):
-        if int(id) in orders.keys():
-            return {'order': {str(id): orders[int(id)]}}
-        else: 
-            return {'message': 'No Parcel delivery order with that id'}, 400
+        try:
+            if int(id) in orders.keys():
+                return {'order': {str(id): orders[int(id)]}}
+            else: 
+                return {'message': 'No Parcel delivery order with that id'}, 400
+        except:
+            return {'message': 'Wrong id format'}, 400
     
     def put(self, id):
         return ''
