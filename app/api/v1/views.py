@@ -1,4 +1,4 @@
-from flask import make_response, Blueprint
+from flask import make_response, Blueprint, request
 from flask_restful  import Api, Resource
 
 
@@ -38,7 +38,11 @@ class Parcels(Resource):
         return '' 
     
     def post(self):
-        return ''
+        order_no = 100
+        data = request.get_json()
+        data_list = data['order']
+        orders[order_no] = data_list
+        return {'messsage': 'Order created'}, 201
 
 class Parcel(Resource):
     def get(self, id):
