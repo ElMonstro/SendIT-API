@@ -14,27 +14,33 @@ class ParcelsTestCase(unittest.TestCase):
         self.order = order
 
 
-class KnownValues(ParcelsTestCase):
+class GoodRequest(ParcelsTestCase):
     """This class tests views with valid requests"""
 
     def test_create_order(self):
         """Tests POST /parcels"""
-        pass
+        response = self.client.post('/api/v1/orders',
+                    data=json.dumps(self.order), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
 
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
-        pass
+        response = self.client.put('/parcels/350/cancel')
+        self.assertEqual(response.status_code, 204)
 
     def test_get_all_orders(self):
         """Tests GET /parcels"""
-        pass
+        response = self.client.get('/parcels')
+        self.assertEqual(response.status_code, 200)
+        
 
     def test_get_all_orders_by_user(self):
         """Tests GET /users/<id>/parcels"""
-        pass
+        response = self.client.get('/users/350/parcels')
+        self.assertEqual(response.status_code, 200)
 
 
-class UnKnownValues(ParcelsTestCase):
+class BadRequest(ParcelsTestCase):
     """This class tests views with invalid requests"""
     def test_create_order(self):
         """Tests POST /parcels"""
