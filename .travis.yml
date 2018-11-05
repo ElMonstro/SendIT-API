@@ -5,6 +5,9 @@ env:
 python:
       - "3.6"
 
+before_install:
+  - "export PYTHONPATH=$PYTHONPATH:$(pwd)"
+
 virtualenv:
       system-site-packages: false
 
