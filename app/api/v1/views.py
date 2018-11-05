@@ -34,19 +34,25 @@ orders = {
 
 
 class Parcels(Resource):
+    def __init__(self):
+        self.order_no = 100
+
     def get(self):
         return '' 
     
     def post(self):
-        order_no = 100
         data = request.get_json()
         data_list = data['order']
-        orders[order_no] = data_list
+        orders[self.order_no] = data_list
+        self.order_no = self.order_no + 1
         return {'messsage': 'Order created'}, 201
 
 class Parcel(Resource):
     def get(self, id):
-        return ''
+        if int(id) in orders.keys():
+            return {'order': {str(id): orders[int(id)]}}
+        else: 
+            return {'message': 'No Parcel delivery order with that id'}, 400
     
     def put(self, id):
         return ''
@@ -63,7 +69,7 @@ class CancelOrder(Resource):
 
 api.add_resource(Parcels, '/parcels')
 api.add_resource(Parcel, '/parcels/<id>')
-api.add_resource(UserParcels, '/<id>/parcels')
+api.add_resource(UserParcels, 'users/<id>/parcels')
 api.add_resource(CancelOrder, '/parcel/<id>/cancel')
 
 
