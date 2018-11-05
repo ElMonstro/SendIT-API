@@ -1,8 +1,8 @@
-from flask import Flask, make_response, Blueprint
+from flask import make_response, Blueprint
 from flask_restful  import Api, Resource
 
 
-v1 = Blueprint('v1', __name__, url_prefix='api/v1')
+v1 = Blueprint('v1', __name__, url_prefix='/api/v1')
 api = Api(v1)
 
 orders = {
