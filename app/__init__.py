@@ -1,4 +1,4 @@
-from app.api.v1.views import v1
+from app.api.v1 import v1
 from flask import Flask
 from instance.config import DevelopmentConfig
 
