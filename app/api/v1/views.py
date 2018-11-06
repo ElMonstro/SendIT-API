@@ -52,6 +52,7 @@ class Parcels(Resource):
         self.order_no = self.order_no + 1
         return {'messsage': 'Order created'}, 201
 
+
 class Parcel(Resource):
     def get(self, id):
         try:
@@ -66,7 +67,17 @@ class Parcel(Resource):
         
     
     def put(self, id):
-        return ''
+        try:
+            int_id = int(id)
+        except:
+            return {'message': 'Wrong id format'}, 400
+
+        if int_id in orders.keys():
+            orders[int_id][4] = delivered
+            return {'message': 'Status changed'} 
+        else:       
+            return {'message': 'No Parcel delivery order with that id'}, 400
+
 
 class UserParcels(Resource):
     def get(self, id):
@@ -82,7 +93,7 @@ class CancelOrder(Resource):
 
         if int_id in orders.keys():
             orders[int_id][4] = canceled
-            return 204
+            return {'message': 'Order canceled'} 
         else:       
             return {'message': 'No Parcel delivery order with that id'}, 400
 
