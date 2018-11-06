@@ -107,9 +107,9 @@ class CancelOrder(Resource):
             return {'message': 'No Parcel delivery order with that id'}, 400
 
 
-api.add_resource(Parcels, '/parcels')
-api.add_resource(Parcel, '/parcels/<id>')
-api.add_resource(UserParcels, '/users/<id>/parcels')
-api.add_resource(CancelOrder, '/parcels/<id>/cancel')
+api.add_resource(Parcels, '/parcels', strict_slashes=False)
+api.add_resource(Parcel, '/parcels/<id>', strict_slashes=False)
+api.add_resource(UserParcels, '/users/<id>/parcels', strict_slashes=False)
+api.add_resource(CancelOrder, '/parcels/<id>/cancel', strict_slashes=False)
 
 
