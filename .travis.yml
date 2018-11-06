@@ -13,6 +13,7 @@ virtualenv:
 # Install dependencies
 install:
       - "pip3 install -r requirements.txt"
+      - "pip3 install coveralls"
 
 script: 
       - "pytest --cov"
