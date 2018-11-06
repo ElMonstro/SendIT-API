@@ -81,7 +81,16 @@ class Parcel(Resource):
 
 class UserParcels(Resource):
     def get(self, id):
-        return ''
+        order_list = {}
+        str_id = str(id)
+        for key, value in orders.items():
+            if str_id == value[0]:
+                order_list[key] = value
+        if not  order_list:
+            return {'message': 'No orders by that user'}, 400
+        return {'orders': order_list}
+
+            
 
 
 class CancelOrder(Resource):
