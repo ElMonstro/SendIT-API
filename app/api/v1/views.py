@@ -43,7 +43,7 @@ class Parcels(Resource):
         self.order_no = 100
 
     def get(self):
-        return '' 
+        return orders
     
     def post(self):
         data = request.get_json()
