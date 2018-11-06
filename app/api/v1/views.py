@@ -1,9 +1,6 @@
-from flask import make_response, Blueprint, request
-from flask_restful  import Api, Resource
+from flask import request
+from flask_restful  import Resource
 
-
-v1 = Blueprint('v1', __name__, url_prefix='/api/v1')
-api = Api(v1)
 
 # Order statuses
 canceled = 'Canceled'
@@ -107,9 +104,6 @@ class CancelOrder(Resource):
             return {'message': 'No Parcel delivery order with that id'}, 400
 
 
-api.add_resource(Parcels, '/parcels', strict_slashes=False)
-api.add_resource(Parcel, '/parcels/<id>', strict_slashes=False)
-api.add_resource(UserParcels, '/users/<id>/parcels', strict_slashes=False)
-api.add_resource(CancelOrder, '/parcels/<id>/cancel', strict_slashes=False)
+
 
 
