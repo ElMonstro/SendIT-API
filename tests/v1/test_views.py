@@ -5,12 +5,13 @@ import json
 order = {'order': ['532', '4 5345 343', '4 5343 343', 5, 'In-transit']}
 response_data = {"order": { "321": ["532", "4 5345 343", "4 5343 343",
             5,
-            "In-transit"
+            "Canceled"
         ]
     }}
 
 class ParcelsTestCase(unittest.TestCase):
     """Parent Testcase class"""
+
     def setUp(self):
         """Sets up test variables"""
         self.app = app
@@ -29,10 +30,17 @@ class GoodRequest(ParcelsTestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(json.loads(response.data), {'messsage': 'Order created'} )
 
+    def test_admin_change_order_status(self):
+        """Tests PUT /parcels/<id>"""
+        response = self.client.put('api/v1/parcels/321')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
-        response = self.client.put('api/parcels/350/cancel')
-        self.assertEqual(response.status_code, 204)
+        response = self.client.put('api/v1/parcels/321/cancel')
+        self.assertEqual(response.status_code, 200)
+
 
     def test_get_all_orders(self):
         """Tests GET /parcels"""
@@ -55,6 +63,7 @@ class GoodRequest(ParcelsTestCase):
 
 class BadRequest(ParcelsTestCase):
     """This class tests views with invalid requests"""
+
    # def test_create_order(self):
     #    """Tests bad requests with POST /parcels"""
     #    pass
@@ -67,6 +76,18 @@ class BadRequest(ParcelsTestCase):
         self.assertEqual(data, {'message': 'No Parcel delivery order with that id'})
 
         response = self.client.put('api/v1/parcels/35uh420/cancel') # Incorrect id format
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(data, {'message': 'Wrong id format'})
+
+    def test_admin_change_order_status(self):
+        """Tests bad requests with PUT /parcels/<id>"""
+        response = self.client.put('api/v1/parcels/35420') # Correct format but not there
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)        
+        self.assertEqual(data, {'message': 'No Parcel delivery order with that id'})
+
+        response = self.client.put('api/v1/parcels/35uh420') # Incorrect id format
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data, {'message': 'Wrong id format'})
