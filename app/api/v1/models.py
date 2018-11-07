@@ -102,6 +102,16 @@ class ParcelOrders:
             return True 
         else:       
             return False
+    
+    
+class Users:
+    """Users operatons"""
+    def __init__(self):
+        self.users = users
+
+    def is_admin(self, user_id):
+        """Returns the admin status of user"""
+        return self.users[user_id][2]
 
 
 class Validator:
