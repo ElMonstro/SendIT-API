@@ -94,11 +94,10 @@ class Validator:
         """Check validity of parcels POST data"""
         if not isinstance(order_list, list):
             return False            
-        if not order_list.length == 5:
+        if not len(order_list) == 5:
             return False        
-        if not isinstance(order_list[0], int) and isinstance(order_list[1], str) and isinstance(order_list[2], str) and isinstance(order_list[3], int) and isinstance(order_list[4], str):
+        if not isinstance(order_list[0], int) and not isinstance(order_list[1], str) and not isinstance(order_list[2], str) and not isinstance(order_list[3], int) and not isinstance(order_list[4], str):
             return False
-        if not order_list[4] == delivered or order_list[4] == canceled or order_list[4] == in_transit:
+        if not order_list[4] in [delivered, in_transit, canceled]:
             return False 
-
         return True
