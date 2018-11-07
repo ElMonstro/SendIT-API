@@ -2,6 +2,7 @@
 # Order statuses
 canceled = 'Canceled'
 delivered = 'Delivered'
+in_transit = 'In-transit'
 
 # Dummy orders
 orders = {
@@ -40,9 +41,15 @@ class ParcelOrders:
 
     def save(self, order_list):
         """Save data from POST request"""
-        orders[self.order_no] = order_list
-        self.order_no = self.order_no + 1
-        return True
+        validator = Validator()
+        valid = validator.order_list_validator(order_list)
+
+        if valid:
+            orders[self.order_no] = order_list
+            self.order_no = self.order_no + 1
+            return True
+        else:
+            return False
 
     def cancel_order(self, order_id):
         """Change order status to cancelled"""
@@ -82,6 +89,16 @@ class ParcelOrders:
             return False
 
 
+class Validator:
+    def order_list_validator(self, order_list):
+        """Check validity of parcels POST data"""
+        if not isinstance(order_list, list):
+            return False            
+        if not order_list.length == 5:
+            return False        
+        if not isinstance(order_list[0], int) and isinstance(order_list[1], str) and isinstance(order_list[2], str) and isinstance(order_list[3], int) and isinstance(order_list[4], str):
+            return False
+        if not order_list[4] == delivered or order_list[4] == canceled or order_list[4] == in_transit:
+            return False 
 
-
-
+        return True
