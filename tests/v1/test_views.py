@@ -153,6 +153,17 @@ class EdgeCasesTestCase(unittest.TestCase):
         for data in bad_data:
             valid = order_list_validator(data)
             self.assertEqual(valid, False)
+
+    def test_user_checker(self):
+        """Test user checker"""
+        good_email = 'jratcher@gmail.com'
+        bad_email = 'rigger@hotmail.com'
+        # Test with email that is registered
+        isThere = self.validator.user_checker(good_email)
+        self.assertEqual(isThere, 100)
+        # Test with email thats not registered
+        isThere = self.validator.user_checker(bad_email)
+        self.assertEqual(isThere, False)        
         
         
 
