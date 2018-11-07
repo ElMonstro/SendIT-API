@@ -1,4 +1,4 @@
-from app.api.v1.views import Parcels, Parcel, CancelOrder, UserParcels
+from app.api.v1.views import Parcels, Parcel, CancelOrder, UserParcels, Login
 from flask import Blueprint
 from flask_restful import Api
 
@@ -12,3 +12,4 @@ api.add_resource(Parcels, '/parcels', strict_slashes=False)
 api.add_resource(Parcel, '/parcels/<id>', strict_slashes=False)
 api.add_resource(UserParcels, '/users/<id>/parcels', strict_slashes=False)
 api.add_resource(CancelOrder, '/parcels/<id>/cancel', strict_slashes=False)
+api.add_resource(Login, '/login', strict_slashes=False)
