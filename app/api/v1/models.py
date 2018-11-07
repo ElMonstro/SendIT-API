@@ -105,6 +105,11 @@ class ParcelOrders:
 
 
 class Validator:
+    """Validates incoming data"""
+
+    def __init__(self):
+        self.users = users
+
     def order_list_validator(self, order_list):
         """Check validity of parcels POST data"""
         if not isinstance(order_list, list):
@@ -118,10 +123,16 @@ class Validator:
         return True
 
     def user_checker(self, user_email):
-        """Checks if user is in users"""
-        self.users = users
+        """Checks if user is in users"""        
         isThere = False
         for key, value in users.items():
             if value[0] == user_email:
                 return key # Returns key if user id is registered               
         return isThere
+
+    def password_checker(self,user_id, pswd):
+        """Checks if password for specified user is valid"""
+        if self.users[user_id][1] == pswd:
+            return True
+        return False
+        
