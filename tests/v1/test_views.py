@@ -1,6 +1,8 @@
 import unittest
 from run import app
 import json
+from app.api.v1.models import Validator
+
 
 order = {'order': ['532', '4 5345 343', '4 5343 343', 5, 'In-transit']}
 response_data = {"order": { "321": [532, "4 5345 343", "4 5343 343", 5, "Canceled"]}}
@@ -11,6 +13,7 @@ users_orders = {
         "813": [350, "4 5435 324", "6 5356 353", 3,  "Delivered"]
     }
 }
+
 
 class ParcelsTestCase(unittest.TestCase):
     """Parent Testcase class"""
@@ -23,7 +26,7 @@ class ParcelsTestCase(unittest.TestCase):
         self.order = order
 
 
-class GoodRequest(ParcelsTestCase):
+class GoodRequestTestCase(ParcelsTestCase):
     """This class tests views with valid requests"""
 
     def test_create_order(self):
@@ -65,7 +68,7 @@ class GoodRequest(ParcelsTestCase):
         self.assertEqual(data, response_data)
 
 
-class BadRequest(ParcelsTestCase):
+class BadRequestTestCase(ParcelsTestCase):
     """This class tests views with invalid requests"""
 
    # def test_create_order(self):
@@ -108,6 +111,12 @@ class BadRequest(ParcelsTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.data), {'message': 'No orders by that user'})
 
+        response = self.client.get('api/v1/users/35fsv530/parcels')
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(data, {'message': 'Wrong id format'})
+
+
     def test_get_specific_order(self):
         """Tests bad requests to GET /parcels/<id>"""
         response = self.client.get('api/v1/parcels/24034')  # Correct format but not there
@@ -119,6 +128,33 @@ class BadRequest(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'Wrong id format'})
         self.assertEqual(response.status_code, 400)
+
+
+class EdgeCasesTestCase(unittest.TestCase):
+    """Tests edge cases"""
+
+    def setUp(self):
+        """Set up test variabled"""
+        self.validator = Validator()
+
+    def test_order_post_data_validator(self):
+        """Tests order_list_validator"""
+        order_list_validator = self.validator.order_list_validator
+        good_data = [532, '4 5345 343', '4 5343 343', 5, 'In-transit']
+        bad_data = [ 'String', ['string', 42453, 53245, 'String', 42524],
+         ['string', 42453, 53245, 'String', 'fsags'],
+         ['string', 53245, 'String', 42524],  43,
+         {'order': ['string', 42453, 53245, 'String', 42524]}
+         ]    
+        # Test with good data
+        valid = order_list_validator(good_data)
+        self.assertEqual(valid, True)
+        # Test with bad data
+        for data in bad_data:
+            valid = order_list_validator(data)
+            self.assertEqual(valid, False)
+        
+        
 
 
     
