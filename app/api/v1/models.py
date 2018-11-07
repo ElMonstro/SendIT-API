@@ -3,6 +3,9 @@
 canceled = 'Canceled'
 delivered = 'Delivered'
 in_transit = 'In-transit'
+# Admin statuses
+admin = True
+not_admin = False
 
 # Dummy orders
 orders = {
@@ -31,6 +34,18 @@ orders = {
     818: [140, '4 5345 343', '4 5343 343', 5, 'In-transit'],
     819: [619, '4 5435 324', '6 5356 353', 3, 'Delivered'],
     820: [805, '5 6535 453', '8 5465 742', 6, 'Canceled']
+}
+
+users = {
+ # userid  email                 password   isadmin
+    100: ['jratcher@gmail.com', 'ulembaya', admin],
+    102: ['dan@gmail.com', 'ulembaya', not_admin],
+    103: ['abby@gmail.com', 'ulembaya', not_admin],
+    104: ['totodi@gmail.com', 'ulembaya', not_admin],
+    105: ['milly@gmail.com', 'ulembaya', not_admin],
+    350: ['callen@gmail.com', 'ulembaya', not_admin], 
+
+
 }
 
 class ParcelOrders:
@@ -101,3 +116,12 @@ class Validator:
         if not order_list[4] in [delivered, in_transit, canceled]:
             return False 
         return True
+
+    def user_checker(self, user_email):
+        """Checks if user is in users"""
+        self.users = users
+        isThere = False
+        for key, value in users.items():
+            if value[0] == user_email:
+                return key # Returns key if user id is registered               
+        return isThere
