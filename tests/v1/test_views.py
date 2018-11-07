@@ -3,12 +3,12 @@ from run import app
 import json
 
 order = {'order': ['532', '4 5345 343', '4 5343 343', 5, 'In-transit']}
-response_data = {"order": { "321": ["532", "4 5345 343", "4 5343 343", 5, "Canceled"]}}
+response_data = {"order": { "321": [532, "4 5345 343", "4 5343 343", 5, "Canceled"]}}
 
 users_orders = {
     "orders": {
-        "353": ["350", "4 5435 324", "6 5356 353", 3, "Delivered" ],
-        "813": ["350", "4 5435 324", "6 5356 353", 3,  "Delivered"]
+        "353": [350, "4 5435 324", "6 5356 353", 3, "Delivered" ],
+        "813": [350, "4 5435 324", "6 5356 353", 3,  "Delivered"]
     }
 }
 
