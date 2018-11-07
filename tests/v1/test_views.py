@@ -163,7 +163,19 @@ class EdgeCasesTestCase(unittest.TestCase):
         self.assertEqual(isThere, 100)
         # Test with email thats not registered
         isThere = self.validator.user_checker(bad_email)
-        self.assertEqual(isThere, False)        
+        self.assertEqual(isThere, False) 
+
+    def test_password_checker(self):
+        """Tests password checker"""
+        password = 'ulembaya'
+        bad_password = 'ngombe wewe'
+        # Check with good password
+        isValid = self.validator.password_checker(100, password)
+        self.assertEqual(isValid, True)
+        # Check with bad password
+        isValid = self.validator.password_checker(100, bad_password)
+        self.assertEqual(isValid, False) 
+
         
         
 
