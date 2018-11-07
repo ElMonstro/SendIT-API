@@ -1,64 +1,47 @@
 from flask import request
 from flask_restful  import Resource
+from app.api.v1.models import ParcelOrders
 
 
-# Order statuses
-canceled = 'Canceled'
-delivered = 'Delivered'
-
-# Dummy orders
-orders = {
-    321: ['532', '4 5345 343', '4 5343 343', 5, 'In-transit'],
-    453: ['352', '4 5435 324', '6 5356 353', 3, 'Delivered'],
-    133: ['254', '5 6535 453', '8 5465 742', 6, 'Canceled'],
-    301: ['686', '4 5345 343', '4 5343 343', 5, 'In-transit'],
-    353: ['350', '4 5435 324', '6 5356 353', 3, 'Delivered'],
-    633: ['345', '5 6535 453', '8 5465 742', 6, 'Canceled'],
-    365: ['140', '4 5345 343', '4 5343 343', 5, 'In-transit'],
-    495: ['675', '4 5435 324', '6 5356 353', 3, 'Delivered'],
-    127: ['109', '5 6535 453', '8 5465 742', 6, 'Canceled'],
-    249: ['140', '4 5345 343', '4 5343 343', 5, 'In-transit'],
-    132: ['619', '4 5435 324', '6 5356 353', 3, 'Delivered'],
-    808: ['805', '5 6535 453', '8 5465 742', 6, 'Canceled'],
-    809: ['532', '4 5345 343', '4 5343 343', 5, 'In-transit'],
-    810: ['352', '4 5435 324', '6 5356 353', 3, 'Delivered'],
-    811: ['254', '5 6535 453', '8 5465 742', 6, 'Canceled'],
-    812: ['686', '4 5345 343', '4 5343 343', 5, 'In-transit'],
-    813: ['350', '4 5435 324', '6 5356 353', 3, 'Delivered'],
-    814: ['345', '5 6535 453', '8 5465 742', 6, 'Canceled'],
-    815: ['140', '4 5345 343', '4 5343 343', 5, 'In-transit'],
-    816: ['675', '4 5435 324', '6 5356 353', 3, 'Delivered'],
-    817: ['109', '5 6535 453', '8 5465 742', 6, 'Canceled'],
-    818: ['140', '4 5345 343', '4 5343 343', 5, 'In-transit'],
-    819: ['619', '4 5435 324', '6 5356 353', 3, 'Delivered'],
-    820: ['805', '5 6535 453', '8 5465 742', 6, 'Canceled']
-}
 
 
 class Parcels(Resource):
+    """Handles requests for the /parcels route"""
+
     def __init__(self):
-        self.order_no = 100
+        self.db = ParcelOrders()
 
     def get(self):
-        return orders
+        return self.db.get_all_orders()
     
     def post(self):
         data = request.get_json()
         data_list = data['order']
-        orders[self.order_no] = data_list
-        self.order_no = self.order_no + 1
-        return {'messsage': 'Order created'}, 201
+        success = self.db.save(data_list)
+
+        if success:       
+            return {'messsage': 'Order created'}, 201
+        else:
+            return {'message': 'Invalid data format'}
 
 
 class Parcel(Resource):
+    """Handles request for /parcels/<id> route"""
+
+    def __init__(self):
+        self.db = ParcelOrders()
+
+
     def get(self, id):
         try:
             int_id = int(id)
         except:
             return {'message': 'Wrong id format'}, 400
 
-        if int_id in orders.keys():
-            return {'order': {str(id): orders[int_id]}}
+        order = self.db.get_specific_order(int_id)
+
+        if order:
+            return order
         else: 
             return {'message': 'No Parcel delivery order with that id'}, 400
         
@@ -69,36 +52,50 @@ class Parcel(Resource):
         except:
             return {'message': 'Wrong id format'}, 400
 
-        if int_id in orders.keys():
-            orders[int_id][4] = delivered
+        success = self.db.change_delivery_status(int_id)
+
+        if success:
             return {'message': 'Status changed'} 
         else:       
             return {'message': 'No Parcel delivery order with that id'}, 400
 
 
 class UserParcels(Resource):
+    """Handles the route /users/<user_id>/parcels"""
+    
+    def __init__(self):
+        self.db = ParcelOrders()
+
     def get(self, id):
-        order_list = {}
-        str_id = str(id)
-        for key, value in orders.items():
-            if str_id == value[0]:
-                order_list[key] = value
-        if not  order_list:
+        try:
+            int_id = int(id)
+        except:
+            return {'message': 'Wrong id format'}, 400
+
+        orders = self.db.get_all_user_orders(int_id)
+
+        if not  orders:
             return {'message': 'No orders by that user'}, 400
-        return {'orders': order_list}
+        return orders
 
             
 
 
 class CancelOrder(Resource):
+    """Handles the route /parcels/<parcel_id>/cancel"""
+
+    def __init__(self):
+        self.db = ParcelOrders()
+
     def put(self, id):
         try:
             int_id = int(id)
         except:
             return {'message': 'Wrong id format'}, 400
 
-        if int_id in orders.keys():
-            orders[int_id][4] = canceled
+        success = self.db.cancel_order(int_id)
+
+        if success:
             return {'message': 'Order canceled'} 
         else:       
             return {'message': 'No Parcel delivery order with that id'}, 400
