@@ -50,8 +50,7 @@ class Parcels(Resource):
         if user_data['is_admin']:
             return { message: 'Cannot perform this operation' }, 401
         data = request.get_json()
-        data_list = data['order']
-        success = self.db.save(data_list)
+        success = self.db.save(data)
 
         if success:       
             return {message: 'Order created'}, 201
@@ -154,13 +153,27 @@ class Login(Resource):
 
     def post(self):
         if self.auth:
-            email = self.auth['email']
-            password = self.auth['password']
+            try:
+                email = self.auth['email']                
+            except TypeError:
+                return {message: 'Invalid data format'}, 400
+            except KeyError:
+                return {message: 'Email not provided'}, 400
+            
+            try:
+                password = self.auth['password']                
+            except TypeError:
+                return {message: 'Invalid data format'}, 400
+            except KeyError:
+                return {message: 'Password not provided'}, 400
+
+            
             user_id = self.validator.user_checker(email)            
             # If user is not registered
             if not user_id:
                 return {message: 'User email not found'}, 401
 
+            # If user is admin
             is_admin = self.users.is_admin(user_id)
 
             isValid = self.validator.password_checker(user_id, password)
@@ -169,12 +182,12 @@ class Login(Resource):
                 exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24*7)
                 payload = {'user id': user_id, 'email': email,'is_admin': is_admin, 'exp': exp}
                 token = jwt.encode(payload, key=secret, ) 
-                return {message: 'You have been logged in',
+                return {
                 'token': token.decode('utf-8',)}
             # If password not valid
             return {message: 'Invalid password'}, 401
         # If there is no authentication information
-        return {message: 'Email and password required'}, 401
+        return {message: 'Email and password required'}, 400
 
 
 

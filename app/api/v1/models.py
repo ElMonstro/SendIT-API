@@ -52,9 +52,14 @@ class ParcelOrders:
         self.orders = orders
         self.order_no = 100
 
-    def save(self, order_list):
+    def save(self, order):
         """Save data from POST request"""
-        validator = Validator()
+        validator = Validator()        
+        try:
+            order_list = order['order']
+        except TypeError:
+            return False
+        
         valid = validator.order_list_validator(order_list)
 
         if valid:
