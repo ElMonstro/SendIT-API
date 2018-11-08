@@ -28,14 +28,8 @@ class ParcelsTestCase(unittest.TestCase):
         self.client = self.app.test_client(self)
         self.app.testing = True
         self.order = order
-        admin_data = json.dumps({'email': 'jratcher@gmail.com',
-                                  'password': 'ulembaya'}) 
-
-        user_data = json.dumps({'email': 'dan@gmail.com',
-                                  'password': 'ulembaya'}) 
-
-
-
+        
+        
 class GoodRequestTestCase(ParcelsTestCase):
     """This class tests views with valid requests"""
 
