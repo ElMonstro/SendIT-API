@@ -177,6 +177,7 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         response = self.client.post('api/v1/login', content_type="application/json", data=data)
        # data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
+    
 
 
 class AuthBadRequestTestCase(ParcelsTestCase):
@@ -223,6 +224,52 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         self.assertEqual(data, {message: 'Password not provided'})
         self.assertEqual(response.status_code, 400)
 
+    def test_create_parcel_authentication(self):
+        """Tests POST requests to api/v1/parcels with no token, invalid token or unauthorized user"""
+        # Test no token in headers
+        response = self.client.post('api/v1/parcels', data=json.dumps(order))
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Token missing'})
+        self.assertEqual(response.status_code, 401)
+        # Test with admin token
+        data = json.dumps(self.order)
+        response = self.client.post('/api/v1/parcels',
+                    data=data, content_type='application/json', headers=self.admin_token_dict )   
+        data = json.loads(response.data)     
+        self.assertEqual(data, {'message': 'Cannot perform this operation'} )
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_all_orders(self):
+        """Tests POST requests to api/v1/parcels with no token, invalid token or unauthorized user"""
+        # Test with user token
+        response = self.client.get('api/v1/parcels', headers=self.user_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Cannot perform this operation'})
+        self.assertEqual(response.status_code, 401)
+
+    def test_specific_order_put(self):
+        """Tests PUT requests to api/v1/parcels/<id> with no token, invalid token or unauthorized user"""
+        # Test with user token
+        response = self.client.put('api/v1/parcels/321', headers=self.user_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Cannot perform this operation'})
+        self.assertEqual(response.status_code, 401)
+        # Test with invalid token
+        response = self.client.put('api/v1/parcels/321', headers={'token': 'jonjffriu8u483u8384u82'})
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Invalid token'})
+        self.assertEqual(response.status_code, 401)
+
+    def test_cancel_order(self):
+        """Tests PUT requests to api/v1/parcels/<parcel-id>/cancel with no token, invalid token or unauthorized user"""
+        # Test with admin token
+        response = self.client.put('api/v1/parcels/321/cancel', headers=self.admin_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Cannot perform this operation'})
+        self.assertEqual(response.status_code, 401)
+
+
+        
 
         
 

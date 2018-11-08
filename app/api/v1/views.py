@@ -8,10 +8,7 @@ from functools import wraps
 
 secret = DevelopmentConfig.SECRET
 
-
-
 message = 'message'
-
 
 # Authentication decorator
 def authenticate(f):
@@ -28,8 +25,6 @@ def authenticate(f):
             return {message: 'Token missing'}, 401       
         
     return wrapper
-
-
 
 
 class Parcels(Resource):
@@ -106,7 +101,7 @@ class UserParcels(Resource):
 
         try:
             int_id = int(id)
-        except:
+        except ValueError:
             return {message: 'Wrong id format'}, 400
 
         if not user_data['user id'] == int(id):
