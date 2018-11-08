@@ -17,6 +17,14 @@ users_orders = {
 user_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtYWlsIjoiYWJieUBnbWFpbC5jb20iLCJpc19hZG1pbiI6ZmFsc2UsImV4cCI6MTU0MjI0NDM4NH0.wLLCb3qYi8ET1NgRj7oH9d9dhxN8hsJp3U81Rmjk4lA"
 admin_token =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDAsImVtYWlsIjoianJhdGNoZXJAZ21haWwuY29tIiwiaXNfYWRtaW4iOnRydWUsImV4cCI6MTU0MjI0NDQ4M30.q_JxTQ3FmDPMe01kIg8-aEJ4Tiik_J2FU39NjiLsazU"
 
+# Login credentials
+admin_login = {'email': 'jratcher@gmail.com',
+                    'password': 'ulembaya'}
+
+user_login = {'email': 'abby@gmail.com',
+                    'password': 'ulembaya'}
+
+message = 'message'
 
 
 class ParcelsTestCase(unittest.TestCase):
@@ -28,6 +36,13 @@ class ParcelsTestCase(unittest.TestCase):
         self.client = self.app.test_client(self)
         self.app.testing = True
         self.order = order
+        data = json.dumps(admin_login)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+        self.admin_token_dict = json.loads(response.data)      
+        data = json.dumps(user_login)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+        self.user_token_dict = json.loads(response.data)
+        
         
         
 class GoodRequestTestCase(ParcelsTestCase):
@@ -36,7 +51,7 @@ class GoodRequestTestCase(ParcelsTestCase):
     def test_create_order(self):
         """Tests POST /parcels"""
         response = self.client.post('/api/v1/parcels',
-                    data=json.dumps(self.order), content_type='application/json', headers={'token': user_token} )
+                    data=json.dumps(self.order), content_type='application/json', headers=self.user_token_dict )
         
         self.assertEqual(json.loads(response.data), {'message': 'Order created'} )
         self.assertEqual(response.status_code, 201)
@@ -44,67 +59,72 @@ class GoodRequestTestCase(ParcelsTestCase):
 
     def test_admin_change_order_status(self):
         """Tests PUT /parcels/<id>"""
-        response = self.client.put('api/v1/parcels/321', headers={'token': admin_token})
+        response = self.client.put('api/v1/parcels/321', headers=self.admin_token_dict)
+        self.assertEqual(json.loads(response.data), {message: 'Status changed'})
         self.assertEqual(response.status_code, 200)
 
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
-        response = self.client.put('api/v1/parcels/321/cancel', headers={'token': user_token})
+        response = self.client.put('api/v1/parcels/321/cancel', headers=self.user_token_dict)
+        self.assertEqual(json.loads(response.data), {message: 'Order canceled'})
         self.assertEqual(response.status_code, 200)
 
 
     def test_get_all_orders(self):
         """Tests GET /parcels"""
-        response = self.client.get('api/v1/parcels', headers={'token': admin_token})
+        response = self.client.get('api/v1/parcels', headers=self.admin_token_dict)
         self.assertEqual(response.status_code, 200)
         
 
     def test_get_all_orders_by_user(self):
         """Tests GET /users/<id>/parcels"""
-        response = self.client.get('api/v1/users/103/parcels', headers={'token': user_token})
+        response = self.client.get('api/v1/users/103/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)
         
         self.assertEqual(data, users_orders)
 
     def test_get_specific_order(self):
         """Tests GET /parcels/<id>"""
-        response = self.client.get('api/v1/parcels/321', headers={'token': user_token})
+        response = self.client.get('api/v1/parcels/321', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, response_data)
-
-    def test_login(self):
-        """Tests Get /login"""
-        pass
 
 
 class BadRequestTestCase(ParcelsTestCase):
     """This class tests views with invalid requests"""
 
-   # def test_create_order(self):
-    #    """Tests bad requests to POST /parcels"""
-    #    pass
+    def test_create_order(self):
+        """Tests bad requests to POST /parcels"""
+        # Test with wrong data format
+        response = self.client.post('/api/v1/parcels',
+                    data=json.dumps(['jay', 'bad', 'data']), content_type='application/json', headers=self.user_token_dict )
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(data, {message: 'Invalid data format'})
 
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
-        response = self.client.put('api/v1/parcels/35420/cancel', headers={'token': user_token}) # Correct format but not there
+        # Test unregistered id 
+        response = self.client.put('api/v1/parcels/35420/cancel', headers=self.user_token_dict) # Correct format but not there
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)        
         self.assertEqual(data, {'message': 'No Parcel delivery order with that id'})
-
-        response = self.client.put('api/v1/parcels/35uh420/cancel', headers={'token': user_token}) # Incorrect id format
+        # Test invalid format id
+        response = self.client.put('api/v1/parcels/35uh420/cancel', headers=self.user_token_dict) # Incorrect id format
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data, {'message': 'Wrong id format'})
 
     def test_admin_change_order_status(self):
         """Tests bad requests to PUT /parcels/<id>"""
-        response = self.client.put('api/v1/parcels/35420', headers={'token': admin_token}) # Correct format but not there
+        # Test unregistered id
+        response = self.client.put('api/v1/parcels/35420', headers=self.admin_token_dict) # Correct format but not there
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)        
         self.assertEqual(data, {'message': 'No Parcel delivery order with that id'})
-
-        response = self.client.put('api/v1/parcels/35uh420', headers={'token': admin_token}) # Incorrect id format
+        # Test invalid format id
+        response = self.client.put('api/v1/parcels/35uh420', headers=self.admin_token_dict) # Incorrect id format
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data, {'message': 'Wrong id format'})
@@ -117,11 +137,11 @@ class BadRequestTestCase(ParcelsTestCase):
 
     def test_get_all_orders_by_user(self):
         """Tests bad requests to GET /users/<id>/parcels"""
-        response = self.client.get('api/v1/users/35530/parcels', headers={'token': user_token})
+        response = self.client.get('api/v1/users/35530/parcels', headers=self.user_token_dict)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(json.loads(response.data), {'message': 'Cannot perform this operation'})
 
-        response = self.client.get('api/v1/users/35fsv530/parcels', headers={'token': user_token})
+        response = self.client.get('api/v1/users/35fsv530/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data, {'message': 'Wrong id format'})
@@ -129,20 +149,87 @@ class BadRequestTestCase(ParcelsTestCase):
 
     def test_get_specific_order(self):
         """Tests bad requests to GET /parcels/<id>"""
-        response = self.client.get('api/v1/parcels/24034', headers={'token': user_token})  # Correct format but not there
+        response = self.client.get('api/v1/parcels/24034', headers=self.user_token_dict)  # Correct format but not there
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'No Parcel delivery order with that id'})
         self.assertEqual(response.status_code, 400)
 
-        response = self.client.get('api/v1/parcels/24034u', headers={'token': user_token}) # Incorrect id format
+        response = self.client.get('api/v1/parcels/24034u', headers=self.user_token_dict) # Incorrect id format
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'Wrong id format'})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)    
+
+
+class AuthGoodRequestTestCase(ParcelsTestCase):
+    """Tests requests with valid authenticaton"""
 
     def test_login(self):
-        """Tests bad requests to POST /login"""
+        """Tests good requests to POST /login"""
+        # Admin login
+        data = admin_login
+        data = json.dumps(data)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+        #data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        # User login
+        data = user_login
+        data = json.dumps(data)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+       # data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
 
-        pass
+
+class AuthBadRequestTestCase(ParcelsTestCase):
+    """Tests with requests with invalid authentication"""
+
+    def test_login(self):
+        """Tests POST /login"""
+        # Test login credentials
+        response = self.client.post('api/v1/login')
+        data = json.loads(response.data)
+        self.assertEqual(data, {'message': 'Email and password required'})
+        self.assertEqual(response.status_code, 400)
+        # Test bad datatype(not dict)
+        response = self.client.post('api/v1/login', data=json.dumps(['emm', 'jay']), content_type='application/json')
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Invalid data format'})
+        self.assertEqual(response.status_code, 400)
+        # Test bad email
+        data = {'email': 'jb', 'password': 'pwd'}
+        data = json.dumps(data)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'User email not found'})
+        self.assertEqual(response.status_code, 401)
+        # Test bad password
+        data = {'email': 'jratcher@gmail.com', 'password': 'pwd'}
+        data = json.dumps(data)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Invalid password'})
+        self.assertEqual(response.status_code, 401)
+        # Test no email
+        data = {'password': 'pwd'}
+        data = json.dumps(data)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Email not provided'})
+        self.assertEqual(response.status_code, 400)
+        # Test no password
+        data = {'email': 'jratcher@gmail.com',}
+        data = json.dumps(data)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Password not provided'})
+        self.assertEqual(response.status_code, 400)
+
+
+        
+
+
+
+
+
 
 
 class EdgeCasesTestCase(unittest.TestCase):
