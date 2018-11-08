@@ -12,6 +12,7 @@ secret = DevelopmentConfig.SECRET
 
 message = 'message'
 
+
 # Authentication decorator
 def authenticate(f):
     @wraps(f)
@@ -19,12 +20,12 @@ def authenticate(f):
         if 'token' in request.headers:
             token = request.headers.get('token')
             try:
-                user_data = jwt.decode(token, key=secret)
+                user_data = jwt.decode(token, key=secret, algorithms='HS256')
             except:
-                return {message: 'Invalid token'}
-            return f(*args, user_data, **kwargs)
+                return {message: 'Invalid token'}, 401
+            return f(*args, **kwargs, user_data=user_data)
         else:
-            return {message: 'Token missing'}        
+            return {message: 'Token missing'}, 401       
         
     return wrapper
 
@@ -39,9 +40,15 @@ class Parcels(Resource):
     
     @authenticate
     def get(self, user_data):
-        return self.db.get_all_orders()
-    
-    def post(self):
+        if user_data['is_admin']:
+            return self.db.get_all_orders()
+        else: 
+            return { message: 'Cannot perform this operation' }, 401
+
+    @authenticate  
+    def post(self, user_data):
+        if user_data['is_admin']:
+            return { message: 'Cannot perform this operation' }, 401
         data = request.get_json()
         data_list = data['order']
         success = self.db.save(data_list)
@@ -49,7 +56,7 @@ class Parcels(Resource):
         if success:       
             return {message: 'Order created'}, 201
         else:
-            return {message: 'Invalid data format'}
+            return {message: 'Invalid data format'}, 400
 
 
 class Parcel(Resource):
@@ -58,8 +65,8 @@ class Parcel(Resource):
     def __init__(self):
         self.db = ParcelOrders()
 
-
-    def get(self, id):
+    @authenticate
+    def get(self, id, user_data):
         try:
             int_id = int(id)
         except:
@@ -72,8 +79,10 @@ class Parcel(Resource):
         else: 
             return {message: 'No Parcel delivery order with that id'}, 400
         
-    
-    def put(self, id):
+    @authenticate
+    def put(self, id, user_data):
+        if not user_data['is_admin']:
+            return { message: 'Cannot perform this operation' }, 401
         try:
             int_id = int(id)
         except:
@@ -93,11 +102,16 @@ class UserParcels(Resource):
     def __init__(self):
         self.db = ParcelOrders()
 
-    def get(self, id):
+    @authenticate
+    def get(self, id, user_data):        
+
         try:
             int_id = int(id)
         except:
             return {message: 'Wrong id format'}, 400
+
+        if not user_data['user id'] == int(id):
+            return { message: 'Cannot perform this operation' }, 401
 
         orders = self.db.get_all_user_orders(int_id)
 
@@ -114,7 +128,10 @@ class CancelOrder(Resource):
     def __init__(self):
         self.db = ParcelOrders()
 
-    def put(self, id):
+    @authenticate
+    def put(self, id, user_data):
+        if user_data['is_admin']:
+            return { message: 'Cannot perform this operation' }, 401
         try:
             int_id = int(id)
         except:
@@ -131,32 +148,33 @@ class Login(Resource):
     """Handles the route /login"""
 
     def __init__(self):
-        self.auth = request.authorization
+        self.auth = request.get_json()
         self.validator = Validator()
         self.users = Users()
 
     def post(self):
         if self.auth:
-            email = self.auth.username
-            password = self.auth.password
-            user_id = self.validator.user_checker(email)
-            is_admin = self.users.is_admin(user_id)
+            email = self.auth['email']
+            password = self.auth['password']
+            user_id = self.validator.user_checker(email)            
             # If user is not registered
             if not user_id:
                 return {message: 'User email not found'}, 401
 
+            is_admin = self.users.is_admin(user_id)
+
             isValid = self.validator.password_checker(user_id, password)
             # If password is valid
             if isValid:
-                exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+                exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24*7)
                 payload = {'user id': user_id, 'email': email,'is_admin': is_admin, 'exp': exp}
-                token = jwt.encode(payload, key=secret) 
+                token = jwt.encode(payload, key=secret, ) 
                 return {message: 'You have been logged in',
-                'token': token.decode('utf-8')}
+                'token': token.decode('utf-8',)}
             # If password not valid
             return {message: 'Invalid password'}, 401
         # If there is no authentication information
-        return {message: 'Email and password required'}, 401, {'www-Authenticate': 'Basic realm="Email and Password Please"'}
+        return {message: 'Email and password required'}, 401
 
 
 
