@@ -3,7 +3,7 @@ language:
 env:
   - CODECOV_TOKEN="bae1d058-97bf-4d5e-8d8e-e3ecc89f4c22"
   global:
-    - CC_TEST_REPORTER_ID=873429bec9fd50de3f9c12a9ff621f5a560d04d2ef28e9f6d15bd00c9ba598d5
+  - CC_TEST_REPORTER_ID="873429bec9fd50de3f9c12a9ff621f5a560d04d2ef28e9f6d15bd00c9ba598d5"
 
 python:
       - "3.6"
