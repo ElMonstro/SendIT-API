@@ -1,1 +1,1 @@
-web: gunicorn app:SendIT-API
+web: gunicorn app:app
