@@ -39,7 +39,7 @@ class Parcels(Resource):
         self.db = ParcelOrders()
     
     @authenticate
-    def get(self, user_data):
+    def get(self, user_data):        
         if user_data['is_admin']:
             return self.db.get_all_orders()
         else: 
@@ -47,15 +47,21 @@ class Parcels(Resource):
 
     @authenticate  
     def post(self, user_data):
+        message_dict = {}
+        status_code = 200
         if user_data['is_admin']:
             return { message: 'Cannot perform this operation' }, 401
+            
         data = request.get_json()
         success = self.db.save(data)
 
         if success:       
-            return {message: 'Order created'}, 201
+            message_dict = {message: 'Order created'}
+            status_code = 201
         else:
-            return {message: 'Invalid data format'}, 400
+            message_dict = {message: 'Invalid data format'}
+            status_code = 400
+        return message_dict, status_code
 
 
 class Parcel(Resource):
@@ -66,6 +72,8 @@ class Parcel(Resource):
 
     @authenticate
     def get(self, id, user_data):
+        message_dict = {}
+        status_code = 200
         try:
             int_id = int(id)
         except ValueError:
@@ -76,10 +84,14 @@ class Parcel(Resource):
         if order:
             return order
         else: 
-            return {message: 'No Parcel delivery order with that id'}, 400
+            message_dict = {message: 'No Parcel delivery order with that id'}
+            status_code = 400
+        return message_dict, status_code
         
     @authenticate
     def put(self, id, user_data):
+        message_dict = {}
+        status_code = 200
         if not user_data['is_admin']:
             return { message: 'Cannot perform this operation' }, 401
         try:
@@ -90,9 +102,11 @@ class Parcel(Resource):
         success = self.db.change_delivery_status(int_id)
 
         if success:
-            return {message: 'Status changed'} 
+            message_dict = {message: 'Status changed'} 
         else:       
-            return {message: 'No Parcel delivery order with that id'}, 400
+            message_dict = {message: 'No Parcel delivery order with that id'}
+            status_code = 400
+        return message_dict, status_code
 
 
 class UserParcels(Resource):
@@ -102,8 +116,9 @@ class UserParcels(Resource):
         self.db = ParcelOrders()
 
     @authenticate
-    def get(self, id, user_data):        
-
+    def get(self, id, user_data):  
+        message_dict = { message: 'Cannot perform this operation' }
+        status_code = 401
         try:
             int_id = int(id)
         except ValueError:
@@ -112,10 +127,11 @@ class UserParcels(Resource):
         if user_data['user id'] == int(id) or user_data['is_admin']:
             orders = self.db.get_all_user_orders(int_id)
             if not  orders:
-                return {message: 'No orders by that user'}, 400
+                message_dict = {message: 'No orders by that user'}
+                status_code = 400
             return orders  
         # If user not admin or his/her id is not equal to the user id are  trying to access
-        return { message: 'Cannot perform this operation' }, 401
+        return message_dict, status_code
 
             
 
@@ -128,6 +144,8 @@ class CancelOrder(Resource):
 
     @authenticate
     def put(self, id, user_data):
+        message_dict = {}
+        status_code = 200
         if user_data['is_admin']:
             return { message: 'Cannot perform this operation' }, 401
         try:
@@ -138,9 +156,11 @@ class CancelOrder(Resource):
         success = self.db.cancel_order(int_id)
 
         if success:
-            return {message: 'Order canceled'} 
+            message_dict = {message: 'Order canceled'} 
         else:       
-            return {message: 'No Parcel delivery order with that id'}, 400
+            message_dict = {message: 'No Parcel delivery order with that id'}
+            status_code = 400
+        return message_dict, status_code
 
 class Login(Resource):
     """Handles the route /login"""
@@ -151,6 +171,8 @@ class Login(Resource):
         self.users = Users()
 
     def post(self):
+        message_dict = {message: 'Email and password required'}
+        status_code = 400
         if self.auth:
             try:
                 email = self.auth['email']                
@@ -184,9 +206,10 @@ class Login(Resource):
                 return {
                 'token': token.decode('utf-8',)}
             # If password not valid
-            return {message: 'Invalid password'}, 401
+            message_dict = {message: 'Invalid password'}
+            status_code = 401
         # If there is no authentication information
-        return {message: 'Email and password required'}, 400
+        return message_dict, status_code
 
 
 
