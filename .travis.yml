@@ -4,7 +4,6 @@ env:
   - CODECOV_TOKEN="bae1d058-97bf-4d5e-8d8e-e3ecc89f4c22"
   global:
     - CC_TEST_REPORTER_ID=873429bec9fd50de3f9c12a9ff621f5a560d04d2ef28e9f6d15bd00c9ba598d5
-    - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
 
 python:
       - "3.6"
