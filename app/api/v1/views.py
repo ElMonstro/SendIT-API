@@ -10,6 +10,8 @@ secret = DevelopmentConfig.SECRET
 
 message = 'message'
 
+expired_token =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtYWlsIjoiYWJieUBnbWFpbC5jb20iLCJpc19hZG1pbiI6ZmFsc2UsImV4cCI6MTU0MTc0MTE0MX0.uckKmwZ3YqQU4M36xhbEcXLx4KQ4B4Ej-Vua4Yw0HCM"
+
 # Authentication decorator
 def authenticate(f):
     @wraps(f)
@@ -18,8 +20,11 @@ def authenticate(f):
             token = request.headers.get('token')
             try:
                 user_data = jwt.decode(token, key=secret, algorithms='HS256')
-            except:
+            except jwt.ExpiredSignatureError:# Add test
+                return {message: 'Token expired, login again'}, 401
+            except jwt.InvalidTokenError:
                 return {message: 'Invalid token'}, 401
+            
             return f(*args, **kwargs, user_data=user_data)
         else:
             return {message: 'Token missing'}, 401       
@@ -63,7 +68,7 @@ class Parcel(Resource):
     def get(self, id, user_data):
         try:
             int_id = int(id)
-        except:
+        except ValueError:
             return {message: 'Wrong id format'}, 400
 
         order = self.db.get_specific_order(int_id)
@@ -79,7 +84,7 @@ class Parcel(Resource):
             return { message: 'Cannot perform this operation' }, 401
         try:
             int_id = int(id)
-        except:
+        except ValueError:
             return {message: 'Wrong id format'}, 400
 
         success = self.db.change_delivery_status(int_id)
@@ -104,14 +109,13 @@ class UserParcels(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        if not user_data['user id'] == int(id):
-            return { message: 'Cannot perform this operation' }, 401
-
-        orders = self.db.get_all_user_orders(int_id)
-
-        if not  orders:
-            return {message: 'No orders by that user'}, 400
-        return orders
+        if user_data['user id'] == int(id) or user_data['is_admin']:
+            orders = self.db.get_all_user_orders(int_id)
+            if not  orders:
+                return {message: 'No orders by that user'}, 400
+            return orders  
+        # If user not admin or his/her id is not equal to the user id are  trying to access
+        return { message: 'Cannot perform this operation' }, 401
 
             
 
@@ -128,7 +132,7 @@ class CancelOrder(Resource):
             return { message: 'Cannot perform this operation' }, 401
         try:
             int_id = int(id)
-        except:
+        except ValueError:
             return {message: 'Wrong id format'}, 400
 
         success = self.db.cancel_order(int_id)
@@ -174,7 +178,7 @@ class Login(Resource):
             isValid = self.validator.password_checker(user_id, password)
             # If password is valid
             if isValid:
-                exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24*7)
+                exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
                 payload = {'user id': user_id, 'email': email,'is_admin': is_admin, 'exp': exp}
                 token = jwt.encode(payload, key=secret, ) 
                 return {
