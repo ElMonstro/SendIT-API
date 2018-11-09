@@ -9,9 +9,12 @@ chardet==3.0.4
 Click==7.0
 codecov==2.0.15
 coverage==4.5.1
+coveralls==1.5.1
 cryptography==2.3.1
+docopt==0.6.2
 Flask==1.0.2
 Flask-RESTful==0.3.6
+gunicorn==19.9.0
 idna==2.7
 isort==4.3.4
 itsdangerous==1.1.0
