@@ -48,13 +48,15 @@ users = {
 
 class ParcelOrders:
     """Orders Model"""
+    
     def __init__(self):
         self.orders = orders
         self.order_no = 100
 
     def save(self, order):
         """Save data from POST request"""
-        validator = Validator()        
+        validator = Validator()
+        is_successful = True        
         try:
             order_list = order['order']
         except TypeError:
@@ -65,9 +67,10 @@ class ParcelOrders:
         if valid:
             orders[self.order_no] = order_list
             self.order_no = self.order_no + 1
-            return True
+            is_successful = True
         else:
-            return False
+            is_successful = False
+        return is_successful
 
     def cancel_order(self, order_id):
         """Change order status to cancelled"""
