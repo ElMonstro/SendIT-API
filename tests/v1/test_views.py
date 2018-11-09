@@ -14,9 +14,6 @@ users_orders = {
     }
 }
 
-user_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtYWlsIjoiYWJieUBnbWFpbC5jb20iLCJpc19hZG1pbiI6ZmFsc2UsImV4cCI6MTU0MjI0NDM4NH0.wLLCb3qYi8ET1NgRj7oH9d9dhxN8hsJp3U81Rmjk4lA"
-admin_token =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDAsImVtYWlsIjoianJhdGNoZXJAZ21haWwuY29tIiwiaXNfYWRtaW4iOnRydWUsImV4cCI6MTU0MjI0NDQ4M30.q_JxTQ3FmDPMe01kIg8-aEJ4Tiik_J2FU39NjiLsazU"
-
 # Login credentials
 admin_login = {'email': 'jratcher@gmail.com',
                     'password': 'ulembaya'}
@@ -25,6 +22,9 @@ user_login = {'email': 'abby@gmail.com',
                     'password': 'ulembaya'}
 
 message = 'message'
+
+expired_token =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtYWlsIjoiYWJieUBnbWFpbC5jb20iLCJpc19hZG1pbiI6ZmFsc2UsImV4cCI6MTU0MTc0MTE0MX0.uckKmwZ3YqQU4M36xhbEcXLx4KQ4B4Ej-Vua4Yw0HCM"
+
 
 
 class ParcelsTestCase(unittest.TestCase):
@@ -49,22 +49,24 @@ class GoodRequestTestCase(ParcelsTestCase):
     """This class tests views with valid requests"""
 
     def test_create_order(self):
-        """Tests POST /parcels"""
+        """Tests good requests to POST /parcels"""
+        # Test with valid data format and right auth token
         response = self.client.post('/api/v1/parcels',
-                    data=json.dumps(self.order), content_type='application/json', headers=self.user_token_dict )
-        
+                    data=json.dumps(self.order), content_type='application/json', headers=self.user_token_dict )        
         self.assertEqual(json.loads(response.data), {'message': 'Order created'} )
         self.assertEqual(response.status_code, 201)
 
 
     def test_admin_change_order_status(self):
         """Tests PUT /parcels/<id>"""
+        # Test with the right auth token
         response = self.client.put('api/v1/parcels/321', headers=self.admin_token_dict)
         self.assertEqual(json.loads(response.data), {message: 'Status changed'})
         self.assertEqual(response.status_code, 200)
 
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
+        # Test with the right auth token
         response = self.client.put('api/v1/parcels/321/cancel', headers=self.user_token_dict)
         self.assertEqual(json.loads(response.data), {message: 'Order canceled'})
         self.assertEqual(response.status_code, 200)
@@ -72,19 +74,21 @@ class GoodRequestTestCase(ParcelsTestCase):
 
     def test_get_all_orders(self):
         """Tests GET /parcels"""
+        # Test with the right token
         response = self.client.get('api/v1/parcels', headers=self.admin_token_dict)
         self.assertEqual(response.status_code, 200)
         
 
     def test_get_all_orders_by_user(self):
         """Tests GET /users/<id>/parcels"""
+        # Test with the right token 
         response = self.client.get('api/v1/users/103/parcels', headers=self.user_token_dict)
-        data = json.loads(response.data)
-        
+        data = json.loads(response.data)        
         self.assertEqual(data, users_orders)
 
     def test_get_specific_order(self):
         """Tests GET /parcels/<id>"""
+        # Test with right auth token
         response = self.client.get('api/v1/parcels/321', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
@@ -137,10 +141,11 @@ class BadRequestTestCase(ParcelsTestCase):
 
     def test_get_all_orders_by_user(self):
         """Tests bad requests to GET /users/<id>/parcels"""
+        # Test with accessing other users parcels  
         response = self.client.get('api/v1/users/35530/parcels', headers=self.user_token_dict)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(json.loads(response.data), {'message': 'Cannot perform this operation'})
-
+        # Test with wrong format user id
         response = self.client.get('api/v1/users/35fsv530/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
@@ -149,11 +154,12 @@ class BadRequestTestCase(ParcelsTestCase):
 
     def test_get_specific_order(self):
         """Tests bad requests to GET /parcels/<id>"""
+        # Test with wrong parcel id
         response = self.client.get('api/v1/parcels/24034', headers=self.user_token_dict)  # Correct format but not there
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'No Parcel delivery order with that id'})
         self.assertEqual(response.status_code, 400)
-
+        # Test with wrong parcel id format
         response = self.client.get('api/v1/parcels/24034u', headers=self.user_token_dict) # Incorrect id format
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'Wrong id format'})
@@ -238,8 +244,16 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)     
         self.assertEqual(data, {'message': 'Cannot perform this operation'} )
         self.assertEqual(response.status_code, 401)
+        # Test with expired token
+        data = json.dumps(self.order)
+        response = self.client.post('/api/v1/parcels',
+                    data=data, content_type='application/json', headers={'token': expired_token} )   
+        data = json.loads(response.data)     
+        self.assertEqual(data, {'message': 'Token expired, login again'} )
+        self.assertEqual(response.status_code, 401)
 
-    def test_get_all_orders(self):
+
+    def test_get_all_orders_authentication(self):
         """Tests POST requests to api/v1/parcels with no token, invalid token or unauthorized user"""
         # Test with user token
         response = self.client.get('api/v1/parcels', headers=self.user_token_dict)
@@ -247,7 +261,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         self.assertEqual(data, {message: 'Cannot perform this operation'})
         self.assertEqual(response.status_code, 401)
 
-    def test_specific_order_put(self):
+    def test_specific_order_put_authentication(self):
         """Tests PUT requests to api/v1/parcels/<id> with no token, invalid token or unauthorized user"""
         # Test with user token
         response = self.client.put('api/v1/parcels/321', headers=self.user_token_dict)
@@ -260,7 +274,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         self.assertEqual(data, {message: 'Invalid token'})
         self.assertEqual(response.status_code, 401)
 
-    def test_cancel_order(self):
+    def test_cancel_order_authentication(self):
         """Tests PUT requests to api/v1/parcels/<parcel-id>/cancel with no token, invalid token or unauthorized user"""
         # Test with admin token
         response = self.client.put('api/v1/parcels/321/cancel', headers=self.admin_token_dict)
@@ -279,11 +293,11 @@ class AuthBadRequestTestCase(ParcelsTestCase):
 
 
 
-class EdgeCasesTestCase(unittest.TestCase):
+class ValidatorsTestCase(unittest.TestCase):
     """Tests edge cases"""
 
     def setUp(self):
-        """Set up test variabled"""
+        """Set up test variables"""
         self.validator = Validator()
 
     def test_order_post_data_validator(self):
