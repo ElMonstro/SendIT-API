@@ -2,20 +2,9 @@ language:
       - "python"
 env:
   - CODECOV_TOKEN="bae1d058-97bf-4d5e-8d8e-e3ecc89f4c22"
-  global:
-  - CC_TEST_REPORTER_ID="873429bec9fd50de3f9c12a9ff621f5a560d04d2ef28e9f6d15bd00c9ba598d5"
 
 python:
       - "3.6"
-
-services:
-  - redis-server
-
-before_script:
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
-
 
 virtualenv:
       system-site-packages: false
@@ -26,12 +15,8 @@ install:
       - "pip3 install coveralls"
 
 script: 
-      - bundle exec rspec
       - "pytest --cov"
-
-after_script:
-      - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-
+      
 after_success:
 - "codecov"
 - "coveralls"
