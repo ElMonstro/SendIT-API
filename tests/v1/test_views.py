@@ -237,6 +237,13 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Password not provided'})
         self.assertEqual(response.status_code, 400)
+        # Test with wrong format of login credentials
+        data = ['Bad', 'data', 'format']
+        data = json.dumps(data)
+        response = self.client.post('api/v1/login', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Invalid data format'})
+        self.assertEqual(response.status_code, 400)
 
     def test_create_parcel_authentication(self):
         """Tests POST requests to api/v1/parcels with no token, invalid token or unauthorized user"""
