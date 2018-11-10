@@ -9,5 +9,4 @@ __Build status__:
 
 __Code Coverage__:
 
-[![Coverage Status](https://coveralls.io/repos/github/ElMonstro/SendIT-API/badge.svg?branch=ft-login-161775086)](https://coveralls.io/github/ElMonstro/SendIT-API?branch=ft-login-161775086)
-
+[![Coverage Status](https://coveralls.io/repos/github/ElMonstro/SendIT-API/badge.svg?branch=bg-returns-false-161859233)](https://coveralls.io/github/ElMonstro/SendIT-API?branch=bg-returns-false-161859233)
