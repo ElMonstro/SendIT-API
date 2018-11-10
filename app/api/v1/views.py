@@ -41,7 +41,7 @@ class Parcels(Resource):
     @authenticate
     def get(self, user_data):        
         if user_data['is_admin']:
-            return self.db.get_all_orders()
+            return self.db.get_all_orders(), 200
         else: 
             return { message: 'Cannot perform this operation' }, 401
 
