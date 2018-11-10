@@ -126,9 +126,8 @@ class UserParcels(Resource):
 
         if user_data['user id'] == int(id) or user_data['is_admin']:
             orders = self.db.get_all_user_orders(int_id)
-            if not  orders:
-                message_dict = {message: 'No orders by that user'}
-                status_code = 400
+            if not orders:
+                return {message: 'No orders by that user'}, 400
             return orders  
         # If user not admin or his/her id is not equal to the user id are  trying to access
         return message_dict, status_code

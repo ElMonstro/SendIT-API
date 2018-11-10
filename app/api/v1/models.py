@@ -91,15 +91,15 @@ class ParcelOrders:
         else: 
             return False
 
-    def get_all_user_orders(self, user_id):
+    def get_all_user_orders(self, user_id): # add tests
         """Returns all orders by specified user"""
         order_list = {}
         for key, value in self.orders.items():
             if user_id == value[0]:
                 order_list[key] = value
-        if not  order_list:
-            return False
-        return {'orders': order_list}
+        if order_list:
+            return {'orders': order_list}
+        else: return False
 
     def change_delivery_status(self, order_id):
         """Changed the specified order's delivery status"""

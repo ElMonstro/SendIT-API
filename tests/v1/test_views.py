@@ -150,6 +150,13 @@ class BadRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data, {'message': 'Wrong id format'})
+        # Test with user with no orders
+        response = self.client.get('api/v1/users/104/parcels', headers=self.admin_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(data, {'message': 'No orders by that user'})
+        self.assertEqual(response.status_code, 400)
+        
+
 
 
     def test_get_specific_order(self):
