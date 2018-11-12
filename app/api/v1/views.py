@@ -1,35 +1,9 @@
 from flask import request
 from flask_restful  import Resource
 from app.api.v1.models import ParcelOrders, Validator, Users
-import jwt
-import datetime
-from instance.config import DevelopmentConfig
-from functools import wraps
+from .mock_data import message
+from app.api.utils.auth_decorator import authenticate
 
-secret = DevelopmentConfig.SECRET
-
-message = 'message'
-
-expired_token =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtYWlsIjoiYWJieUBnbWFpbC5jb20iLCJpc19hZG1pbiI6ZmFsc2UsImV4cCI6MTU0MTc0MTE0MX0.uckKmwZ3YqQU4M36xhbEcXLx4KQ4B4Ej-Vua4Yw0HCM"
-
-# Authentication decorator
-def authenticate(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if 'token' in request.headers:
-            token = request.headers.get('token')
-            try:
-                user_data = jwt.decode(token, key=secret, algorithms='HS256')
-            except jwt.ExpiredSignatureError:# Add test
-                return {message: 'Token expired, login again'}, 401
-            except jwt.InvalidTokenError:
-                return {message: 'Invalid token'}, 401
-            
-            return f(*args, **kwargs, user_data=user_data)
-        else:
-            return {message: 'Token missing'}, 401       
-        
-    return wrapper
 
 
 class Parcels(Resource):
