@@ -77,7 +77,7 @@ pip install -r requirements.txt
 
 ## Testing
 ### Manual Testing
-To test the endpointsensure that the following tools are available the follow steps below
+To test the endpoints ensure that the following tools are available the follow steps below
    ### Tools:
      Postman
   - Run the project with:
