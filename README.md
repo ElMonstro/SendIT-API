@@ -76,7 +76,7 @@ pip install -r requirements.txt
 ```
 
 ## Testing
-# Manual Testing
+### Manual Testing
 To test the endpointsensure that the following tools are available the follow steps below
    ### Tools:
      Postman
