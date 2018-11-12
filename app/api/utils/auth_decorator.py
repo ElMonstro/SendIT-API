@@ -1,13 +1,8 @@
 import jwt
 import datetime
-from instance.config import DevelopmentConfig
 from functools import wraps
 from app.api.v1.mock_data import message
-from flask import request
-
-
-secret = DevelopmentConfig.SECRET
-
+from flask import request, current_app as app
 
 
 # Authentication decorator
@@ -17,7 +12,7 @@ def authenticate(f):
         if 'token' in request.headers:
             token = request.headers.get('token')
             try:
-                user_data = jwt.decode(token, key=secret, algorithms='HS256')
+                user_data = jwt.decode(token, key=app.config['SECRET'], algorithms='HS256')
             except jwt.ExpiredSignatureError:# Add test
                 return {message: 'Token expired, login again'}, 401
             except jwt.InvalidTokenError:
