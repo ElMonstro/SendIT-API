@@ -1,8 +1,11 @@
-from flask import request
+from flask import request, current_app as app
 from flask_restful  import Resource
 from app.api.v1.models import ParcelOrders, Validator, Users
 from .mock_data import message
 from app.api.utils.auth_decorator import authenticate
+import datetime
+import jwt
+
 
 
 
@@ -175,7 +178,7 @@ class Login(Resource):
             if isValid:
                 exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
                 payload = {'user id': user_id, 'email': email,'is_admin': is_admin, 'exp': exp}
-                token = jwt.encode(payload, key=secret, ) 
+                token = jwt.encode(payload, key=app.config['SECRET'], ) 
                 return {
                 'token': token.decode('utf-8',)}
             # If password not valid
