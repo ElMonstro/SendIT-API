@@ -8,5 +8,3 @@ def create_app():
     app.config.from_object(DevelopmentConfig)
     app.register_blueprint(v1)
     return app
-
-
