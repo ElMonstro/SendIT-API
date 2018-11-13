@@ -2,7 +2,7 @@ import unittest
 from run import app
 import json
 from app.api.v1.models import Validator, orders
-from app.api.v1.mock_data import order,response_data, expired_token, admin_login, user_login, message, users_orders
+from app.api.v1.mock_data import order,response_data, expired_token, admin_login, user_login, message, users_orders, orders
 
 
 class ParcelsTestCase(unittest.TestCase):
@@ -55,6 +55,9 @@ class GoodRequestTestCase(ParcelsTestCase):
         # Test with the right token
         response = self.client.get('api/v1/parcels', headers=self.admin_token_dict)
         self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertTrue('orders' in data)
+        
         
         
 
@@ -64,6 +67,7 @@ class GoodRequestTestCase(ParcelsTestCase):
         response = self.client.get('api/v1/users/103/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)        
         self.assertEqual(data, users_orders)
+        self.assertEqual(response.status_code, 200)
 
     def test_get_specific_order(self):
         """Tests GET /parcels/<id>"""
@@ -161,14 +165,16 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         data = admin_login
         data = json.dumps(data)
         response = self.client.post('api/v1/login', content_type="application/json", data=data)
-        #data = json.loads(response.data)
+        data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
+        self.assertTrue('token' in data)
         # User login
         data = user_login
         data = json.dumps(data)
         response = self.client.post('api/v1/login', content_type="application/json", data=data)
-       # data = json.loads(response.data)
+        data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
+        self.assertTrue('token' in data)
     
 
 
@@ -276,16 +282,6 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         self.assertEqual(response.status_code, 401)
 
 
-        
-
-        
-
-
-
-
-
-
-
 class ValidatorsTestCase(unittest.TestCase):
     """Tests edge cases"""
 
@@ -332,14 +328,4 @@ class ValidatorsTestCase(unittest.TestCase):
         isValid = self.validator.password_checker(100, bad_password)
         self.assertEqual(isValid, False) 
 
-        
-        
-
-
     
-
-
-
-
-        
-
