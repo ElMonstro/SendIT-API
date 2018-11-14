@@ -12,10 +12,12 @@ class Parcels(Resource):
     """Handles requests for the /parcels route"""
 
     def __init__(self):
+        """Initialize Parcels class"""
         self.db = ParcelOrders()
 
     @authenticate
     def get(self, user_data):
+        """Handles get requests to /parcels route"""
         if user_data['is_admin']:
             return {message: 'All orders fetched',
                 'orders': self.db.get_all_orders()}, 200
@@ -24,6 +26,7 @@ class Parcels(Resource):
 
     @authenticate
     def post(self, user_data):
+        """Handles post requests to /parcels route"""
         message_dict = {}
         status_code = 200
         if user_data['is_admin']:
@@ -46,10 +49,12 @@ class Parcel(Resource):
     """Handles request for /parcels/<id> route"""
 
     def __init__(self):
+        """Initialize Parcel class"""
         self.db = ParcelOrders()
 
     @authenticate
     def get(self, id, user_data):
+        """Handles get requests to /parcels<id> route"""
         message_dict = {}
         status_code = 200
         try:
@@ -69,6 +74,7 @@ class Parcel(Resource):
 
     @authenticate
     def put(self, id, user_data):
+        """Handles put requests to /parcels<id> route"""
         message_dict = {}
         status_code = 200
         if not user_data['is_admin']:
@@ -93,10 +99,12 @@ class UserParcels(Resource):
     """Handles the route /users/<user_id>/parcels"""
 
     def __init__(self):
+        """Initialize UserParcels class"""
         self.db = ParcelOrders()
 
     @authenticate
     def get(self, id, user_data):
+        """Handles get requests to users/<id>/parcels route"""
         message_dict = {message: 'Cannot perform this operation'}
         status_code = 401
         try:
@@ -117,10 +125,12 @@ class CancelOrder(Resource):
     """Handles the route /parcels/<parcel_id>/cancel"""
 
     def __init__(self):
+        """Initialize CancelOrder"""
         self.db = ParcelOrders()
 
     @authenticate
     def put(self, id, user_data):
+        """Handles put requests to /parcels<id>/cancel route"""
         message_dict = {}
         status_code = 200
         if user_data['is_admin']:
@@ -144,6 +154,7 @@ class Login(Resource):
     """Handles the route /login"""
 
     def __init__(self):
+        """Initialize login class"""
         self.auth = request.get_json()
         self.validator = Validator()
         self.users = Users()
