@@ -1,69 +1,68 @@
-from .mock_data import users, orders, admin, delivered, in_transit, canceled, not_admin
+from random import randint
+from .mock_data import users
+# Order statuses
+canceled = 'Canceled'
+delivered = 'Delivered'
+in_transit = 'In-transit'
+message = 'message'
+
+orders = []
 
 
 class ParcelOrders:
     """Orders Model"""
-
     def __init__(self):
-        self.orders = orders
-        self.order_no = 100
+        self.validator = Validator()
 
-    def save(self, order):
-        """Save data from POST request"""
-        validator = Validator()
-        is_successful = True
-        try:
-            order_list = order['order']
-        except TypeError:
-            return False
+    def save(self, order, user_id):
+        """Save data from POST request"""           
+        message = self.validator.order_list_validator(order)
 
-        valid = validator.order_list_validator(order_list)
-
-        if valid:
-            orders[self.order_no] = order_list
-            self.order_no = self.order_no + 1
-            is_successful = True
+        if message == True:
+            order['order_id'] = randint(100, 1000)
+            order['curr_loc'] = order['pickup']
+            order['status'] = in_transit
+            order['user_id'] = user_id
+            orders.append(order)
+            return order
         else:
-            is_successful = False
-        return is_successful
+            return message
 
     def cancel_order(self, order_id):
         """Change order status to cancelled"""
-        if order_id in self.orders.keys():
-            self.orders[order_id][4] = canceled
-            return True
-        else:
-            return False
+        for order in orders:
+            if order_id == order['order_id']:
+                order['status'] = canceled
+                return order
+        return False
 
     def get_all_orders(self):
         """Returns all orders"""
-        return self.orders
+        return orders
 
     def get_specific_order(self, order_id):
         """Returns specified order"""
-        if order_id in self.orders.keys():
-            return {'order': {str(order_id): orders[order_id]}}
-        else:
-            return False
+        for order in orders:
+            if order_id == order['order_id']:
+                return order
+        return False
+
 
     def get_all_user_orders(self, user_id):  # add tests
         """Returns all orders by specified user"""
-        order_list = {}
-        for key, value in self.orders.items():
-            if user_id == value[0]:
-                order_list[key] = value
-        if order_list:
-            return {'orders': order_list}
-        else:
-            return False
+        orders_list = []
+        for order in orders:
+            if order['user_id'] == user_id:
+                orders_list.append(order)
+        return orders_list
 
     def change_delivery_status(self, order_id):
         """Changed the specified order's delivery status"""
-        if order_id in self.orders.keys():
-            orders[order_id][4] = delivered
-            return True
-        else:
-            return False
+        for order in orders:
+            if order_id == order['order_id']:
+                order['status'] = delivered
+                return order
+        return False
 
 
 class Users:
@@ -83,16 +82,21 @@ class Validator:
     def __init__(self):
         self.users = users
 
-    def order_list_validator(self, order_list):
+    def order_list_validator(self, order):
         """Check validity of parcels POST data"""
-        if not isinstance(order_list, list):
-            return False
-        if not len(order_list) == 5:
-            return False
-        if not isinstance(order_list[0], int) and not isinstance(order_list[1], str) and not isinstance(order_list[2], str) and not isinstance(order_list[3], int) and not isinstance(order_list[4], str):
-            return False
-        if not order_list[4] in [delivered, in_transit, canceled]:
-            return False
+        keys = ['pickup', 'dest', 'recepient_name', 'recepient_no', 'weight']
+        if not isinstance(order, dict):
+            return {message: 'Payload must be a dictionary(object)'}
+        if not len(order.keys()) == 5:
+            return {message: 'Invalid number of order details'}
+        if not sorted(list(order.keys())) == sorted(keys):
+            return {message: 'One or more of object keys is invalid'}
+        if not isinstance(order['weight'], str) and not isinstance(order['pickup'], int) and not isinstance(order['dest'], int) and not isinstance(order['recepient_name'], str) and not isinstance(order['recepient_no'], int):
+            return {message: 'Wrong data type on one or more details'}
+        if not len(str(order['recepient_no'])) == 9:
+            return {message: 'Phone number must have ten digits'}
+        if not len(str(order['pickup'])) == 8 and not len(str(order['dest'])) == 8:
+            return {message: 'Addresses should be eight digits'}        
         return True
 
     def user_checker(self, user_email):
