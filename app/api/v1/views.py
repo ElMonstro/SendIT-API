@@ -1,10 +1,11 @@
 from flask import request, current_app as app
 from flask_restful import Resource
 from app.api.v1.models import ParcelOrders, Validator, Users
-from .mock_data import message
 from app.api.utils.auth_decorator import authenticate
 import datetime
 import jwt
+
+message = 'message'
 
 
 class Parcels(Resource):
@@ -16,7 +17,8 @@ class Parcels(Resource):
     @authenticate
     def get(self, user_data):
         if user_data['is_admin']:
-            return {'orders': self.db.get_all_orders()}, 200
+            return {message: 'All orders fetched',
+                'orders': self.db.get_all_orders()}, 200
         else:
             return {message: 'Cannot perform this operation'}, 401
 
@@ -28,13 +30,14 @@ class Parcels(Resource):
             return {message: 'Cannot perform this operation'}, 401
 
         data = request.get_json()
-        success = self.db.save(data)
+        order = self.db.save(data, user_data['user id'])
 
-        if success:
-            message_dict = {message: 'Order created'}
+        if not message in order:
+            message_dict = {message: 'Order created',
+            'order': order}
             status_code = 201
         else:
-            message_dict = {message: 'Invalid data format'}
+            message_dict = order
             status_code = 400
         return message_dict, status_code
 
@@ -57,7 +60,8 @@ class Parcel(Resource):
         order = self.db.get_specific_order(int_id)
 
         if order:
-            return order
+          return {message: 'One order fetched', 'order': order}
+    
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
@@ -74,10 +78,11 @@ class Parcel(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        success = self.db.change_delivery_status(int_id)
+        order = self.db.change_delivery_status(int_id)
 
-        if success:
-            message_dict = {message: 'Status changed'}
+        if order:
+            message_dict = {message: 'Status changed',
+            'order': order}
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
@@ -103,7 +108,7 @@ class UserParcels(Resource):
             orders = self.db.get_all_user_orders(int_id)
             if not orders:
                 return {message: 'No orders by that user'}, 400
-            return orders
+            return {message: 'User orders fetched', 'order': orders}
         # If user not admin or his/her id is not equal to the user id are  trying to access
         return message_dict, status_code
 
@@ -125,10 +130,10 @@ class CancelOrder(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        success = self.db.cancel_order(int_id)
+        order = self.db.cancel_order(int_id)
 
-        if success:
-            message_dict = {message: 'Order canceled'}
+        if order:
+            message_dict = {message: 'Order canceled', 'order': order}
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
