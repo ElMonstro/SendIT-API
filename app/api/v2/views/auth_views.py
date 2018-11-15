@@ -12,26 +12,6 @@ secret = DevelopmentConfig.SECRET
 message = 'message'
 
 
-# Authentication decorator
-def authenticate(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if 'token' in request.headers:
-            token = request.headers.get('token')
-            try:
-                user_data = jwt.decode(token, key=secret, algorithms='HS256')
-            except jwt.ExpiredSignatureError:# Add test
-                return {message: 'Token expired, login again'}, 401
-            except jwt.InvalidTokenError:
-                return {message: 'Invalid token'}, 401
-            
-            return f(*args, **kwargs, user_data=user_data)
-        else:
-            return {message: 'Token missing'}, 401       
-        
-    return wrapper
-
-
 class Login(Resource):
     """Handles the route /login"""
 
@@ -71,7 +51,7 @@ class Login(Resource):
             # If password is valid
             if is_valid:
                 exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-                payload = {'user id': user_id, 'username': username,'is_admin': is_admin, 'exp': exp}
+                payload = {'user_id': user_id, 'exp': exp}
                 token = jwt.encode(payload, key=secret, ) 
                 return {
                 'token': token.decode('utf-8',)}
