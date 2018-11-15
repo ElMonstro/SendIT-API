@@ -1,7 +1,8 @@
+import os
 from app.db_config import get_connection
 import psycopg2
 from flask import current_app as app 
-from app.api.utils.validators import Validator
+from app.api.v2.utils.validators import Validator
 
 
 # Admin statuses
@@ -11,7 +12,7 @@ not_admin = False
 class DataBase:
     """Initialize  database classes"""
     def __init__(self):
-        self.conn = get_connection(app.config['DB_URL'])
+        self.conn = get_connection(os.getenv('DB_URL'))
         self.cursor = self.conn.cursor()
         self.validators = Validator()
 
