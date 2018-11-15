@@ -1,4 +1,4 @@
-from app.api.utils.validators import Validator
+from app.api.v2.utils.validators import Validator
 from .user_models import DataBase
 from app.db_config import drop_tables, create_tables
 
