@@ -13,27 +13,29 @@ class Parcels(Resource):
 
     def __init__(self):
         """Initialize Parcels class"""
-        self.db = ParcelOrders()
+        self.orders = ParcelOrders()
+        self.users = Users()
 
     @authenticate
-    def get(self, user_data):
+    def get(self, user_id):
         """Handles get requests to /parcels route"""
-        if user_data['is_admin']:
+        if user_id:
             return {message: 'All orders fetched',
-                'orders': self.db.get_all_orders()}, 200
+                'orders': self.orders.get_all_orders()}, 200
         else:
             return {message: 'Cannot perform this operation'}, 401
 
     @authenticate
-    def post(self, user_data):
+    def post(self, user_id):
         """Handles post requests to /parcels route"""
         message_dict = {}
         status_code = 200
-        if user_data['is_admin']:
+
+        if self.users.is_admin(user_id):
             return {message: 'Cannot perform this operation'}, 401
 
         data = request.get_json()
-        order = self.db.save(data, user_data['user id'])
+        order = self.orders.save(data, user_id)
 
         if not message in order:
             message_dict = {message: 'Order created',
@@ -50,10 +52,11 @@ class Parcel(Resource):
 
     def __init__(self):
         """Initialize Parcel class"""
-        self.db = ParcelOrders()
+        self.orders = ParcelOrders()
+        self.users = Users()
 
     @authenticate
-    def get(self, id, user_data):
+    def get(self, id, user_id):
         """Handles get requests to /parcels<id> route"""
         message_dict = {}
         status_code = 200
@@ -62,7 +65,7 @@ class Parcel(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        order = self.db.get_specific_order(int_id)
+        order = self.orders.get_specific_order(int_id)
 
         if order:
           return {message: 'One order fetched', 'order': order}
@@ -73,18 +76,18 @@ class Parcel(Resource):
         return message_dict, status_code
 
     @authenticate
-    def put(self, id, user_data):
+    def put(self, id, user_id):
         """Handles put requests to /parcels<id> route"""
         message_dict = {}
         status_code = 200
-        if not user_data['is_admin']:
+        if not self.users.is_admin(user_id):
             return {message: 'Cannot perform this operation'}, 401
         try:
             int_id = int(id)
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        order = self.db.change_delivery_status(int_id)
+        order = self.orders.change_delivery_status(int_id)
 
         if order:
             message_dict = {message: 'Status changed',
@@ -100,10 +103,11 @@ class UserParcels(Resource):
 
     def __init__(self):
         """Initialize UserParcels class"""
-        self.db = ParcelOrders()
+        self.orders = ParcelOrders()
+        self.users = Users
 
     @authenticate
-    def get(self, id, user_data):
+    def get(self, id, user_id):
         """Handles get requests to users/<id>/parcels route"""
         message_dict = {message: 'Cannot perform this operation'}
         status_code = 401
@@ -112,8 +116,9 @@ class UserParcels(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        if user_data['user id'] == int(id) or user_data['is_admin']:
-            orders = self.db.get_all_user_orders(int_id)
+        is_admin = self.users.is_admin(user_id)
+        if user_id == int_id or is_admin:
+            orders = self.orders.get_all_user_orders(int_id)
             if not orders:
                 return {message: 'No orders by that user'}, 400
             return {message: 'User orders fetched', 'order': orders}
@@ -126,21 +131,21 @@ class CancelOrder(Resource):
 
     def __init__(self):
         """Initialize CancelOrder"""
-        self.db = ParcelOrders()
+        self.orders = ParcelOrders()
 
     @authenticate
-    def put(self, id, user_data):
+    def put(self, id, user_id):
         """Handles put requests to /parcels<id>/cancel route"""
         message_dict = {}
         status_code = 200
-        if user_data['is_admin']:
+        if user_id:
             return {message: 'Cannot perform this operation'}, 401
         try:
             int_id = int(id)
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        order = self.db.cancel_order(int_id)
+        order = self.orders.cancel_order(int_id)
 
         if order:
             message_dict = {message: 'Order canceled', 'order': order}
@@ -180,17 +185,13 @@ class Login(Resource):
             user_id = self.validator.user_checker(email)
             # If user is not registered
             if not user_id:
-                return {message: 'User email not found'}, 401
-
-            # If user is admin
-            is_admin = self.users.is_admin(user_id)
+                return {message: 'User not registered'}, 401
 
             isValid = self.validator.password_checker(user_id, password)
             # If password is valid
             if isValid:
                 exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-                payload = {'user id': user_id, 'email': email,
-                           'is_admin': is_admin, 'exp': exp}
+                payload = {'user_id': user_id, 'exp': exp}
                 token = jwt.encode(payload, key=app.config['SECRET'], )
                 return {
                     'token': token.decode('utf-8',)}
