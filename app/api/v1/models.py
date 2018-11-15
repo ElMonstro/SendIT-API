@@ -120,7 +120,7 @@ class Validator:
             return {message: 'Invalid number of order details'}
         if not sorted(list(order.keys())) == sorted(keys):
             return {message: 'One or more of object keys is invalid'}
-        if not isinstance(order['weight'], int) and not isinstance(order['pickup'], int) and not isinstance(order['dest'], int) and not isinstance(order['recepient_name'], str) and not isinstance(order['recepient_no'], int):
+        if not isinstance(order['weight'], int) or not isinstance(order['pickup'], int) or not isinstance(order['dest'], int) or not isinstance(order['recepient_name'], str) or not isinstance(order['recepient_no'], int):
             return {message: 'Wrong data type on one or more details'}
         if not len(str(order['recepient_no'])) == 9:
             return {message: 'Phone number must have ten digits'}

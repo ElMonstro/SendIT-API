@@ -337,7 +337,7 @@ class ValidatorsTestCase(unittest.TestCase):
         res_message = order_list_validator(mock_data['invalid_tel'])
         self.assertEqual(res_message, {message: 'Phone number must have ten digits'} )
         res_message = order_list_validator(mock_data['invalid_data'])
-        #self.assertEqual(res_message, {message: 'Wrong data type on one or more details'})
+        self.assertEqual(res_message, {message: 'Wrong data type on one or more details'})
 
     def test_user_checker(self):
         """Test user checker"""

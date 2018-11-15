@@ -104,4 +104,4 @@ venv.bak/
 
 # vscode
 .vscode/
-tests/python_playground.py
+python_playground.py
