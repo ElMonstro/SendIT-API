@@ -10,8 +10,8 @@ class Orders(DataBase):
         is_succesful = False
         is_valid = self.validators.order_list_validator(order_list)
         order_dict = {'user_id': order_list[0], 'recepient_name': order_list[1], 'recepient_no': order_list[2], 'weight': order_list[3], 'pickup': order_list[4], 'dest': order_list[5]}
-        query = """INSERT INTO orders (user_id,recepient_name, recepient_no, weight, pickup, current_location, dest)
-                VALUES ({user_id}, '{recepient_name}', '{recepient_no}',{weight}, '{pickup}', '{pickup}', '{dest}');""".format(**order_dict)
+        query = """INSERT INTO orders (user_id,recepient_name, recepient_no, weight, pickup, dest)
+                VALUES ({user_id}, '{recepient_name}', '{recepient_no}',{weight}, '{pickup}', '{dest}');""".format(**order_dict)
         if is_valid:
             self.cursor.execute(query)
             self.conn.commit()
