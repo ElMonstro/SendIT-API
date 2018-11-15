@@ -1,4 +1,4 @@
-from random import randint
+from itertools import count
 from .mock_data import users
 # Order statuses
 canceled = 'Canceled'
@@ -7,11 +7,12 @@ in_transit = 'In-transit'
 message = 'message'
 
 orders = []
-
+counter = count(start=100)
 
 class ParcelOrders:
     """Orders Model"""
     def __init__(self):
+        """Initialize parcel orders"""
         self.validator = Validator()
 
     def save(self, order, user_id):
@@ -19,7 +20,7 @@ class ParcelOrders:
         message = self.validator.order_list_validator(order)
 
         if message == True:
-            order['order_id'] = randint(100, 1000)
+            order['order_id'] = next(counter)
             order['curr_loc'] = order['pickup']
             order['status'] = in_transit
             order['user_id'] = user_id
