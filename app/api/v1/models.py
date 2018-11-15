@@ -65,6 +65,14 @@ class ParcelOrders:
                 return order
         return False
 
+    def get_order_owner(self, order_id):
+        """Checks if user is in users"""
+        isThere = False
+        for order in orders:
+            if order['order_id'] == order_id:
+                return order['user_id']  # Returns key if user id
+        return isThere
+
 
 class Users:
     """Users operatons"""
@@ -78,6 +86,23 @@ class Users:
         for user in users:
             if user['user_id'] == user_id:
                 return user['is_admin']
+
+    def user_checker(self, user_email):
+        """Checks if user is in users"""
+        isThere = False
+        for user in users:
+            if user['email'] == user_email:
+                return user['user_id']  # Returns key if user id is registered
+        return isThere
+
+    def password_checker(self, user_id, pswd):
+        """Checks if password for specified user is valid"""
+        for user in users:
+            if user['user_id'] == user_id:
+                return user['password'] == pswd
+
+    
+
 
 
 class Validator:
@@ -95,7 +120,7 @@ class Validator:
             return {message: 'Invalid number of order details'}
         if not sorted(list(order.keys())) == sorted(keys):
             return {message: 'One or more of object keys is invalid'}
-        if not isinstance(order['weight'], str) and not isinstance(order['pickup'], int) and not isinstance(order['dest'], int) and not isinstance(order['recepient_name'], str) and not isinstance(order['recepient_no'], int):
+        if not isinstance(order['weight'], int) and not isinstance(order['pickup'], int) and not isinstance(order['dest'], int) and not isinstance(order['recepient_name'], str) and not isinstance(order['recepient_no'], int):
             return {message: 'Wrong data type on one or more details'}
         if not len(str(order['recepient_no'])) == 9:
             return {message: 'Phone number must have ten digits'}
@@ -103,16 +128,4 @@ class Validator:
             return {message: 'Addresses should be eight digits'}        
         return True
 
-    def user_checker(self, user_email):
-        """Checks if user is in users"""
-        isThere = False
-        for user in users:
-            if user['email'] == user_email:
-                return user['user_id']  # Returns key if user id is registered
-        return isThere
-
-    def password_checker(self, user_id, pswd):
-        """Checks if password for specified user is valid"""
-        for user in users:
-            if user['user_id'] == user_id:
-                return user['password'] == pswd
+    

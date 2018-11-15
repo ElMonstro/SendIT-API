@@ -19,7 +19,7 @@ class Parcels(Resource):
     @authenticate
     def get(self, user_id):
         """Handles get requests to /parcels route"""
-        if user_id:
+        if self.users.is_admin(user_id):
             return {message: 'All orders fetched',
                 'orders': self.orders.get_all_orders()}, 200
         else:
@@ -104,7 +104,7 @@ class UserParcels(Resource):
     def __init__(self):
         """Initialize UserParcels class"""
         self.orders = ParcelOrders()
-        self.users = Users
+        self.users = Users()
 
     @authenticate
     def get(self, id, user_id):
@@ -121,7 +121,7 @@ class UserParcels(Resource):
             orders = self.orders.get_all_user_orders(int_id)
             if not orders:
                 return {message: 'No orders by that user'}, 400
-            return {message: 'User orders fetched', 'order': orders}
+            return {message: 'User orders fetched', 'orders': orders}
         # If user not admin or his/her id is not equal to the user id are  trying to access
         return message_dict, status_code
 
@@ -132,26 +132,27 @@ class CancelOrder(Resource):
     def __init__(self):
         """Initialize CancelOrder"""
         self.orders = ParcelOrders()
+        self.users = Users()
 
     @authenticate
     def put(self, id, user_id):
         """Handles put requests to /parcels<id>/cancel route"""
         message_dict = {}
         status_code = 200
-        if user_id:
-            return {message: 'Cannot perform this operation'}, 401
+       
         try:
             int_id = int(id)
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
+        order_owner = self.orders.get_order_owner(int_id)
+        if not order_owner:
+            return {message: 'No Parcel delivery order with that id'}, 400
+        if not user_id == order_owner:
+            return {message: 'Cannot perform this operation'}, 401
         order = self.orders.cancel_order(int_id)
-
         if order:
             message_dict = {message: 'Order canceled', 'order': order}
-        else:
-            message_dict = {message: 'No Parcel delivery order with that id'}
-            status_code = 400
         return message_dict, status_code
 
 
@@ -182,12 +183,12 @@ class Login(Resource):
             except KeyError:
                 return {message: 'Password not provided'}, 400
 
-            user_id = self.validator.user_checker(email)
+            user_id = self.users.user_checker(email)
             # If user is not registered
             if not user_id:
                 return {message: 'User not registered'}, 401
 
-            isValid = self.validator.password_checker(user_id, password)
+            isValid = self.users.password_checker(user_id, password)
             # If password is valid
             if isValid:
                 exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
