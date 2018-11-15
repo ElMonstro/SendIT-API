@@ -108,9 +108,6 @@ class Users:
 class Validator:
     """Validates incoming data"""
 
-    def __init__(self):
-        self.users = users
-
     def order_list_validator(self, order):
         """Check validity of parcels POST data"""
         keys = ['pickup', 'dest', 'recepient_name', 'recepient_no', 'weight']
