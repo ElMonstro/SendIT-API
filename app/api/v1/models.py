@@ -69,11 +69,14 @@ class Users:
     """Users operatons"""
 
     def __init__(self):
+        """Initialize users class"""
         self.users = users
 
     def is_admin(self, user_id):
         """Returns the admin status of user"""
-        return self.users[user_id][2]
+        for user in users:
+            if user['user_id'] == user_id:
+                return user['is_admin']
 
 
 class Validator:
@@ -102,13 +105,13 @@ class Validator:
     def user_checker(self, user_email):
         """Checks if user is in users"""
         isThere = False
-        for key, value in users.items():
-            if value[0] == user_email:
-                return key  # Returns key if user id is registered
+        for user in users:
+            if user['email'] == user_email:
+                return user['user_id']  # Returns key if user id is registered
         return isThere
 
     def password_checker(self, user_id, pswd):
         """Checks if password for specified user is valid"""
-        if self.users[user_id][1] == pswd:
-            return True
-        return False
+        for user in users:
+            if user['user_id'] == user_id:
+                return user['password'] == pswd
