@@ -1,8 +1,8 @@
 import unittest
 from run import app
 import json
-from app.api.v1.models import Validator, orders
-from app.api.v1.mock_data import order, response_data, expired_token, admin_login, user_login, message, users_orders, orders
+from app.api.v1.models import Validator, Users
+from .mock_data import mock_data, message
 
 
 class ParcelsTestCase(unittest.TestCase):
@@ -13,15 +13,17 @@ class ParcelsTestCase(unittest.TestCase):
         self.app = app
         self.client = self.app.test_client(self)
         self.app.testing = True
-        self.order = order
-        data = json.dumps(admin_login)
+        self.order = mock_data['order']
+        data = json.dumps(mock_data['admin'])
         response = self.client.post(
             'api/v1/login', content_type="application/json", data=data)
         self.admin_token_dict = json.loads(response.data)
-        data = json.dumps(user_login)
+        data = json.dumps(mock_data['user'])
         response = self.client.post(
             'api/v1/login', content_type="application/json", data=data)
         self.user_token_dict = json.loads(response.data)
+        self.client.post('api/v1/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
+        self.client.post('api/v1/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
 
 
 class GoodRequestTestCase(ParcelsTestCase):
@@ -32,26 +34,27 @@ class GoodRequestTestCase(ParcelsTestCase):
         # Test with valid data format and right auth token
         response = self.client.post('/api/v1/parcels',
                                     data=json.dumps(self.order), content_type='application/json', headers=self.user_token_dict)
-        self.assertEqual(json.loads(response.data), {
-                         'message': 'Order created'})
+        self.assertTrue('order' in json.loads(response.data))
+        self.assertEqual(json.loads(response.data)['message'], 'Order created')
         self.assertEqual(response.status_code, 201)
 
     def test_admin_change_order_status(self):
         """Tests PUT /parcels/<id>"""
         # Test with the right auth token
         response = self.client.put(
-            'api/v1/parcels/321', headers=self.admin_token_dict)
-        self.assertEqual(json.loads(response.data), {
-                         message: 'Status changed'})
+            'api/v1/parcels/100', headers=self.admin_token_dict)
+        self.assertTrue('order' in json.loads(response.data))
+        self.assertEqual(json.loads(response.data)['message'], 'Status changed')
         self.assertEqual(response.status_code, 200)
 
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
         # Test with the right auth token
+        self.client.post('api/v1/parcels', data=json.dumps(mock_data['order']), headers=self.user_token_dict)
         response = self.client.put(
-            'api/v1/parcels/321/cancel', headers=self.user_token_dict)
-        self.assertEqual(json.loads(response.data), {
-                         message: 'Order canceled'})
+            'api/v1/parcels/100/cancel', headers=self.user_token_dict)
+        self.assertTrue('order' in json.loads(response.data))
+        self.assertEqual(json.loads(response.data)['message'], 'Order canceled')
         self.assertEqual(response.status_code, 200)
 
     def test_get_all_orders(self):
@@ -67,19 +70,19 @@ class GoodRequestTestCase(ParcelsTestCase):
         """Tests GET /users/<id>/parcels"""
         # Test with the right token
         response = self.client.get(
-            'api/v1/users/103/parcels', headers=self.user_token_dict)
+            'api/v1/users/102/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, users_orders)
+        self.assertTrue('orders' in data)
         self.assertEqual(response.status_code, 200)
 
     def test_get_specific_order(self):
         """Tests GET /parcels/<id>"""
         # Test with right auth token
         response = self.client.get(
-            'api/v1/parcels/321', headers=self.user_token_dict)
+            'api/v1/parcels/100', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, response_data)
+        self.assertTrue('order' in data) 
 
 
 class BadRequestTestCase(ParcelsTestCase):
@@ -87,13 +90,13 @@ class BadRequestTestCase(ParcelsTestCase):
 
     def test_create_order(self):
         """Tests bad requests to POST /parcels"""
-        # Test with wrong data format
+        # Test with wrong data type
         response = self.client.post('/api/v1/parcels',
                                     data=json.dumps(['jay', 'bad', 'data']), content_type='application/json', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(data, {message: 'Invalid data format'})
-
+        self.assertEqual(data, {'message': 'Payload must be a dictionary(object)'})
+       
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
         # Test unregistered id
@@ -177,7 +180,7 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
     def test_login(self):
         """Tests good requests to POST /login"""
         # Admin login
-        data = admin_login
+        data = mock_data['admin']
         data = json.dumps(data)
         response = self.client.post(
             'api/v1/login', content_type="application/json", data=data)
@@ -185,7 +188,7 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
         # User login
-        data = user_login
+        data = mock_data['user']
         data = json.dumps(data)
         response = self.client.post(
             'api/v1/login', content_type="application/json", data=data)
@@ -216,7 +219,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.post(
             'api/v1/login', content_type="application/json", data=data)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'User email not found'})
+        self.assertEqual(data, {message: 'User not registered'})
         self.assertEqual(response.status_code, 401)
         # Test bad password
         data = {'email': 'jratcher@gmail.com', 'password': 'pwd'}
@@ -254,7 +257,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
     def test_create_parcel_authentication(self):
         """Tests POST requests to api/v1/parcels with no token, invalid token or unauthorized user"""
         # Test no token in headers
-        response = self.client.post('api/v1/parcels', data=json.dumps(order))
+        response = self.client.post('api/v1/parcels', data=json.dumps(mock_data['order']))
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Token missing'})
         self.assertEqual(response.status_code, 401)
@@ -268,7 +271,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         # Test with expired token
         data = json.dumps(self.order)
         response = self.client.post('/api/v1/parcels',
-                                    data=data, content_type='application/json', headers={'token': expired_token})
+                                    data=data, content_type='application/json', headers={'token': mock_data['expired']})
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'Token expired, login again'})
         self.assertEqual(response.status_code, 401)
@@ -286,13 +289,13 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         """Tests PUT requests to api/v1/parcels/<id> with no token, invalid token or unauthorized user"""
         # Test with user token
         response = self.client.put(
-            'api/v1/parcels/321', headers=self.user_token_dict)
+            'api/v1/parcels/100', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Cannot perform this operation'})
         self.assertEqual(response.status_code, 401)
         # Test with invalid token
         response = self.client.put(
-            'api/v1/parcels/321', headers={'token': 'jonjffriu8u483u8384u82'})
+            'api/v1/parcels/100', headers={'token': 'jonjffriu8u483u8384u82'})
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid token'})
         self.assertEqual(response.status_code, 401)
@@ -301,7 +304,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         """Tests PUT requests to api/v1/parcels/<parcel-id>/cancel with no token, invalid token or unauthorized user"""
         # Test with admin token
         response = self.client.put(
-            'api/v1/parcels/321/cancel', headers=self.admin_token_dict)
+            'api/v1/parcels/100/cancel', headers=self.admin_token_dict)
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Cannot perform this operation'})
         self.assertEqual(response.status_code, 401)
@@ -313,33 +316,38 @@ class ValidatorsTestCase(unittest.TestCase):
     def setUp(self):
         """Set up test variables"""
         self.validator = Validator()
+        self.users = Users()
 
     def test_order_post_data_validator(self):
         """Tests order_list_validator"""
         order_list_validator = self.validator.order_list_validator
-        good_data = [532, '4 5345 343', '4 5343 343', 5, 'In-transit']
-        bad_data = ['String', ['string', 42453, 53245, 'String', 42524],
-                    ['string', 42453, 53245, 'String', 'fsags'],
-                    ['string', 53245, 'String', 42524],  43,
-                    {'order': ['string', 42453, 53245, 'String', 42524]}
-                    ]
+        good_data = mock_data['order']
+       
         # Test with good data
         valid = order_list_validator(good_data)
         self.assertEqual(valid, True)
+        message = 'message'
         # Test with bad data
-        for data in bad_data:
-            valid = order_list_validator(data)
-            self.assertEqual(valid, False)
+        res_message = order_list_validator(mock_data['bad_key'])
+        self.assertEqual(res_message, {message: 'One or more of object keys is invalid'})
+        res_message = order_list_validator(mock_data['invalid_addr'])
+        self.assertEqual(res_message, {message: 'Addresses should be eight digits'}  )
+        res_message = order_list_validator(mock_data['less'])
+        self.assertEqual(res_message, {message: 'Invalid number of order details'} )
+        res_message = order_list_validator(mock_data['invalid_tel'])
+        self.assertEqual(res_message, {message: 'Phone number must have ten digits'} )
+        res_message = order_list_validator(mock_data['invalid_data'])
+        #self.assertEqual(res_message, {message: 'Wrong data type on one or more details'})
 
     def test_user_checker(self):
         """Test user checker"""
         good_email = 'jratcher@gmail.com'
         bad_email = 'rigger@hotmail.com'
         # Test with email that is registered
-        isThere = self.validator.user_checker(good_email)
+        isThere = self.users.user_checker(good_email)
         self.assertEqual(isThere, 100)
         # Test with email thats not registered
-        isThere = self.validator.user_checker(bad_email)
+        isThere = self.users.user_checker(bad_email)
         self.assertEqual(isThere, False)
 
     def test_password_checker(self):
@@ -347,8 +355,8 @@ class ValidatorsTestCase(unittest.TestCase):
         password = 'ulembaya'
         bad_password = 'ngombe wewe'
         # Check with good password
-        isValid = self.validator.password_checker(100, password)
+        isValid = self.users.password_checker(100, password)
         self.assertEqual(isValid, True)
         # Check with bad password
-        isValid = self.validator.password_checker(100, bad_password)
+        isValid = self.users.password_checker(100, bad_password)
         self.assertEqual(isValid, False)
