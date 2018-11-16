@@ -2,24 +2,28 @@ from app.api.v2.utils.validators import Validator
 from .user_models import DataBase
 from app.db_config import drop_tables, create_tables
 
-
+message = 'message'
 
 class Orders(DataBase):
     """Handles order tables operations"""
-    def add_order(self, order_list):
-        is_succesful = False
-        is_valid = self.validators.order_list_validator(order_list)
-        order_dict = {'user_id': order_list[0], 'recepient_name': order_list[1], 'recepient_no': order_list[2], 'weight': order_list[3], 'pickup': order_list[4], 'dest': order_list[5]}
+    def add_order(self, order, user_id):
+        """Saves order to database"""
+        messo = self.validators.order_list_validator(order)
+        if not messo == True:
+            return messo
+
+        order['user_id'] = user_id
+        
         query = """INSERT INTO orders (user_id,recepient_name, recepient_no, weight, pickup, dest)
-                VALUES ({user_id}, '{recepient_name}', '{recepient_no}',{weight}, '{pickup}', '{dest}');""".format(**order_dict)
-        if is_valid:
-            self.cursor.execute(query)
-            self.conn.commit()
-            is_succesful = True
-        return is_succesful  
+                VALUES ({user_id}, '{recepient_name}', '{recepient_no}',{weight}, '{pickup}', '{dest}');""".format(**order)
+
+        self.cursor.execute(query)
+        self.conn.commit()
+        return order
+
     
     def get_order(self, order_id):
-        query = """SELECT  user_id,recepient_name, recepient_no, weight, pickup, dest, status FROM users WHERE order_id = {};""".format(order_id)
+        query = """SELECT  user_id, recepient_name, recepient_no, weight, pickup, dest, status FROM users WHERE order_id = {};""".format(order_id)
         self.cursor.execute(query)
         order = self.cursor.fetchone()
         order_dict = {order_id: [order[0], order[1], order[2], order[3], order[4], order[5], order[6]]}
@@ -30,11 +34,19 @@ class Orders(DataBase):
         query = """SELECT order_id, user_id, pickup, dest, current_location, weight, status FROM orders;"""
         self.cursor.execute(query)
         orders = self.cursor.fetchall()
-        orders_dict = {}
+        orders_list = []
         if orders:
             for order in orders:
-                orders_dict[order[0]] = [order[1], order[2], order[3]]
-        return orders_dict
+                orders_list.append({
+                    'order_id': order[0],
+                    'user_id': order[1],
+                    'pickup': order[2],
+                    'dest': order[3],
+                    'curr_loc': order[4],
+                    'weight': order[5],
+                    'status': order[6],
+                })
+        return orders_list
 
 
     def get_users_orders(self, user_id):
