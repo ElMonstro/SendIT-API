@@ -62,15 +62,12 @@ class Users(DataBase):
         
         
 
-    def is_user_there(self, username):
+    def get_user_id(self, username):
         """Check if user is there"""
-        is_there = True
-        query = """SELECT  password FROM users WHERE username = '{}';""".format(username)
+        query = """SELECT  user_id FROM users WHERE username = '{}';""".format(username)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
-        if not result:
-            is_there = False
-        return is_there
+        return result
 
     def create_admin(self):
         """Creates admin"""    
@@ -79,11 +76,14 @@ class Users(DataBase):
         self.cursor.execute(query)
         self.conn.commit()
 
-    def is_admin(self, username):
+    def is_admin(self, user_id):
         """check if user is an admin"""
-        query = """SELECT is_admin FROM users WHERE username = '{}'""".format(username)
+        query = """SELECT is_admin FROM users WHERE user_id = {}""".format(user_id)
         self.cursor.execute(query)
-        return self.cursor.fetchone[0]
+        admin = self.cursor.fetchone()[0]
+        return admin
+    
+
     
 
 
