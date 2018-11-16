@@ -15,29 +15,35 @@ class Parcels(Resource):
     """Handles requests for the /parcels route"""
 
     def __init__(self):
-        self.orders = Orders()
+        self.orders = Orders() 
+
     
     @authenticate
     def get(self, user_data):        
         if user_data['is_admin']:
-            return self.orders.get_all_orders()
+            orders = self.orders.get_all_orders()
+            return {message: "All orders fetched", 'orders': orders}
         else: 
             return { message: 'Cannot perform this operation' }, 401
 
     @authenticate
     def post(self, user_data):
+        """Handles post requests to /parcels route"""
         message_dict = {}
         status_code = 200
-        if user_data['is_admin']:
-            return { message: 'Cannot perform this operation' }, 401
-            
+
+        if user_data['is_admin']: 
+            return {message: 'Cannot perform this operation'}, 401
+
         data = request.get_json()
-        success = self.orders.add_order(data['order'])
-        if success:       
-            message_dict = {message: 'Order created'}
+        order = self.orders.add_order(data, user_data['user_id'])
+
+        if not message in order:
+            message_dict = {message: 'Order created',
+            'order': order}
             status_code = 201
         else:
-            message_dict = {message: 'Invalid data format'}
+            message_dict = order
             status_code = 400
         return message_dict, status_code
 
