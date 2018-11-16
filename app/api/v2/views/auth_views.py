@@ -40,18 +40,15 @@ class Login(Resource):
                 return {message: 'Password not provided'}, 400
                
             # If user is not registered
-            user_id = self.users.is_user_there(username)
+            user_id = self.users.get_user_id(username)
             if not user_id:
                 return {message: 'User not registered'}, 401
-
-            # If user is admin
-            is_admin = self.users.is_admin(username) 
 
             is_valid = self.users.check_password(username, password)
             # If password is valid
             if is_valid:
                 exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-                payload = {'user_id': user_id, 'exp': exp}
+                payload = {'user_id': user_id[0], 'exp': exp}
                 token = jwt.encode(payload, key=secret, ) 
                 return {
                 'token': token.decode('utf-8',)}
