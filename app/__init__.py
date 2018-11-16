@@ -10,6 +10,7 @@ from app.db_config import create_tables, drop_tables
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(DevelopmentConfig)
+    #drop_tables()
     create_tables(os.getenv('DB_URL'))
     app.register_blueprint(v1)
     app.register_blueprint(v2)

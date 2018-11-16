@@ -1,4 +1,4 @@
-import psycopg2 as psycopg2
+import psycopg2
 from flask import current_app as app
 
 
@@ -60,7 +60,7 @@ def create_queries():
         CREATE TABLE IF NOT EXISTS  orders (
         order_id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(user_id) ,
-        recepient_name VARCHAR (355) UNIQUE NOT NULL,
+        recepient_name VARCHAR (355) NOT NULL,
         recepient_no INTEGER NOT NULL,        
         pickup VARCHAR (50) NOT NULL,
         current_location VARCHAR (50),
@@ -82,5 +82,8 @@ def create_queries():
 
     create_admin ="""INSERT INTO users (username, password, email, is_admin)
                 VALUES ('admin', 'password', 'jratcher@gmail.com', True);"""
+    
+    create_user ="""INSERT INTO users (username, password, email, is_admin)
+                VALUES ('dan', 'password', 'dan@gmail.com', False);"""
 
-    return [user_table, order_table, notifications, create_admin]
+    return [user_table, order_table, notifications, create_admin, create_user]
