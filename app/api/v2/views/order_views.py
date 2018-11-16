@@ -85,7 +85,8 @@ class Parcel(Resource):
 
         if self.orders.is_order_there(int_id):
             self.orders.deliver_order(user_data['user id'], int_id)
-            message_dict = {message: 'Status changed'} 
+            order_d = self.orders.get_order(int_id)
+            message_dict = {message: 'Status changed', 'orders': order_d} 
         else:       
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
@@ -110,7 +111,8 @@ class CancelOrder(Resource):
             return {message: 'Wrong id format'}, 400
 
         if self.orders.is_order_there(int_id):
-            message_dict = {message: 'Order canceled'} 
+            order_d = self.orders.get_order(int_id)
+            message_dict = {message: 'Order canceled', 'order': order_d} 
         else:       
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
