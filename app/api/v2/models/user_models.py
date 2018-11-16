@@ -80,8 +80,10 @@ class Users(DataBase):
         """check if user is an admin"""
         query = """SELECT is_admin FROM users WHERE user_id = {}""".format(user_id)
         self.cursor.execute(query)
-        admin = self.cursor.fetchone()[0]
-        return admin
+        admin = self.cursor.fetchone()
+        if admin: 
+            return admin[0]
+        return False
     
 
     
