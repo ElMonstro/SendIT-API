@@ -14,7 +14,7 @@ class Orders(DataBase):
 
         order['user_id'] = user_id
         
-        query = """INSERT INTO orders (user_id,recepient_name, recepient_no, weight, pickup, dest)
+        query = """INSERT INTO orders (user_id, recepient_name, recepient_no, weight, pickup, dest)
                 VALUES ({user_id}, '{recepient_name}', '{recepient_no}',{weight}, '{pickup}', '{dest}');""".format(**order)
 
         self.cursor.execute(query)
@@ -23,10 +23,21 @@ class Orders(DataBase):
 
     
     def get_order(self, order_id):
-        query = """SELECT  user_id, recepient_name, recepient_no, weight, pickup, dest, status FROM users WHERE order_id = {};""".format(order_id)
+        query = """SELECT order_id, user_id, pickup, dest, current_location, weight, status, recepient_no, recepient_name  FROM orders WHERE order_id = {};""".format(order_id)
         self.cursor.execute(query)
         order = self.cursor.fetchone()
-        order_dict = {order_id: [order[0], order[1], order[2], order[3], order[4], order[5], order[6]]}
+        order_dict = {
+                    'order_id': order[0],
+                    'user_id': order[1],
+                    'pickup': order[2],
+                    'dest': order[3],
+                    'curr_loc': order[4],
+                    'weight': order[5],
+                    'status': order[6],
+                    'recepient_no': order[7],
+                    'recepient_name': order[8]
+
+                }
         return order_dict
 
     def get_all_orders(self):

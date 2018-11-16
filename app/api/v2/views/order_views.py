@@ -66,7 +66,7 @@ class Parcel(Resource):
         order = self.orders.get_order(int_id)
 
         if order:
-            return order
+            message_dict = {message: 'One order fetched', 'order': order}
         else: 
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
