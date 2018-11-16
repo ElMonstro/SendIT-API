@@ -74,7 +74,7 @@ class Orders(DataBase):
     def is_order_there(self, order_id):
         """Check if order is there"""
         is_there = True
-        query = """SELECT  user_id FROM order WHERE order_id = {};""".format(order_id)
+        query = """SELECT  user_id FROM orders WHERE order_id = {};""".format(order_id)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         if not result:
