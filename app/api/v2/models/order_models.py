@@ -1,3 +1,4 @@
+
 from app.api.v2.utils.validators import Validator
 from .user_models import DataBase
 from app.db_config import drop_tables, create_tables
@@ -123,6 +124,24 @@ class Orders(DataBase):
         status = self.cursor.fetchone()
         if status: status = status[0]
         return status
+
+    def get_notifications(self, user_id):
+        """Get users notifications"""
+        query = """UPDATE notifications SET is_seen = FALSE WHERE user_id = {} 
+        RETURNING *;"""
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        created = result[5].replace(microsecond=0)
+        datestring = str(created)
+        notification = {
+            'notification_id': result[0],
+            'user_id': result[1],
+            'order_id': result[2],
+            'message': result[3],
+            'created': datestring
+        }
+        return notification
+
 
 
 
