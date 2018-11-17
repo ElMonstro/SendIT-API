@@ -72,32 +72,7 @@ class Parcel(Resource):
             status_code = 400
         return message_dict, status_code
         
-    @authenticate
-    def put(self, id, user_data):
-        message_dict = {}
-        status_code = 200
-        if not user_data['is_admin']:
-            return { message: 'Cannot perform this operation' }, 400
-        try:
-            int_id = int(id)
-        except ValueError:
-            return {message: 'Wrong id format'}, 400
-
-        status = self.orders.get_order_status(int_id)
-
-        if status:
-            if status == 'Delivered':
-                return {message: 'Unsuccesful, order already delivered'}, 403
-            if status == 'Canceled':
-                return {message: 'Unsuccessful, order is canceled'}, 403
-            self.orders.deliver_order(user_data['user_id'], int_id)
-            order_d = self.orders.get_order(int_id)
-            message_dict = {message: 'Status changed', 'orders': order_d} 
-        else:       
-            message_dict = {message: 'No Parcel delivery order with that id'}
-            status_code = 400
-        return message_dict, status_code            
-
+    
 
 class CancelOrder(Resource):
     """Handles the route /parcels/<parcel_id>/cancel"""
@@ -107,6 +82,7 @@ class CancelOrder(Resource):
 
     @authenticate
     def put(self, id, user_data):
+        """Handles PUTrcels/<parcel_id>/cancel"""
         message_dict = {}
         status_code = 200
         if user_data['is_admin']:
@@ -130,3 +106,38 @@ class CancelOrder(Resource):
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
         return message_dict, status_code
+
+
+class DeliverOrder(Resource):
+    """Handle the route /parcels/<id>/deliver"""
+
+    def __init__(self):
+        self.orders = Orders()
+
+    @authenticate
+    def put(self, id, user_data):
+        """Handle put requests to route /parcels/<id>/deliver"""
+        message_dict = {}
+        status_code = 200
+        if not user_data['is_admin']:
+            return { message: 'Cannot perform this operation' }, 401
+        try:
+            int_id = int(id)
+        except ValueError:
+            return {message: 'Wrong id format'}, 400
+
+        status = self.orders.get_order_status(int_id)
+
+        if status:
+            if status == 'Delivered':
+                return {message: 'Unsuccesful, order already delivered'}, 403
+            if status == 'Canceled':
+                return {message: 'Unsuccessful, order is canceled'}, 403
+            self.orders.deliver_order(user_data['user_id'], int_id)
+            order_d = self.orders.get_order(int_id)
+            message_dict = {message: 'Status changed', 'orders': order_d} 
+        else:       
+            message_dict = {message: 'No Parcel delivery order with that id'}
+            status_code = 400
+        return message_dict, status_code            
+
