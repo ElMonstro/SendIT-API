@@ -66,10 +66,20 @@ class Orders(DataBase):
         query = """SELECT order_id, user_id, pickup, dest, current_location, weight, status FROM orders where user_id = {};""".format(user_id)
         self.cursor.execute(query)
         orders = self.cursor.fetchall()
-        orders_dict = {}
+        orders_list = []
         if orders:
             for order in orders:
-                orders_dict[order[0]] = [order[1], order[2], order[3]]
+                order_dict = {
+                    'order_id': order[0],
+                    'user_id': order[1],
+                    'pickup': order[2],
+                    'dest': order[3],
+                    'curr_loc': order[4],
+                    'weight': order[5],
+                    'status': order[6]
+                }
+                orders_list.append(order_dict)
+            return orders_list
         return False
 
     def is_order_there(self, order_id):
