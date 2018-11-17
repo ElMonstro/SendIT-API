@@ -87,8 +87,6 @@ class Users(DataBase):
     
 
     
-
-
 class Notification(DataBase):
     """Handles notification table operations"""
     def get_notifications(self, user_id):
