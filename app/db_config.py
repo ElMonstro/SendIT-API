@@ -1,3 +1,4 @@
+import os
 import psycopg2
 from flask import current_app as app
 
@@ -29,9 +30,7 @@ def create_tables(url):
     conn = get_connection(url)
     cursor = conn.cursor()
     db_name = url.split('/')[-1]
-    if db_name == 'test_db':
-        queries.pop()
-
+    
     try:
         for query in queries:
             cursor.execute(query)
@@ -39,7 +38,7 @@ def create_tables(url):
         pass
     conn.commit()
 
-def drop_tables():
+def drop_tables(url=os.getenv('DB_URL')):
     """Delete tables"""
     query = """DROP TABLE IF EXISTS users, orders, notifications CASCADE; """
     conn = get_connection(url)

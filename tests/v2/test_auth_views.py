@@ -15,7 +15,7 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         data = mock_data['admin']
         data = json.dumps(data)
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
@@ -23,7 +23,7 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         data = mock_data['user']
         data = json.dumps(data)
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
@@ -35,53 +35,53 @@ class AuthBadRequestTestCase(ParcelsTestCase):
     def test_login(self):
         """Tests POST /login"""
         # Test login credentials
-        response = self.client.post('api/v2/login')
+        response = self.client.post('api/v2/auth/login')
         data = json.loads(response.data)
-        self.assertEqual(data, {'message': 'Email and password required'})
+        self.assertEqual(data, {'message': 'Username and password required'})
         self.assertEqual(response.status_code, 400)
         # Test bad datatype(not dict)
         response = self.client.post(
-            'api/v2/login', data=json.dumps(['emm', 'jay']), content_type='application/json')
+            'api/v2/auth/login', data=json.dumps(['emm', 'jay']), content_type='application/json')
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid data format'})
         self.assertEqual(response.status_code, 400)
-        # Test bad email
-        data = {'email': 'jb', 'password': 'pwd'}
+        # Test bad username
+        data = {'username': 'jb', 'password': 'pwd'}
         data = json.dumps(data)
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'User not registered'})
         self.assertEqual(response.status_code, 401)
         # Test bad password
-        data = {'email': 'jratcher@gmail.com', 'password': 'pwd'}
+        data = {'username': 'admin', 'password': 'pwd'}
         data = json.dumps(data)
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid password'})
         self.assertEqual(response.status_code, 401)
-        # Test no email
+        # Test no username
         data = {'password': 'pwd'}
         data = json.dumps(data)
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'Email not provided'})
+        self.assertEqual(data, {message: 'Username not provided'})
         self.assertEqual(response.status_code, 400)
         # Test no password
-        data = {'email': 'jratcher@gmail.com', }
+        data = {'username': 'admin', }
         data = json.dumps(data)
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Password not provided'})
         self.assertEqual(response.status_code, 400)
-        # Test with wrong format of login credentials
+        # Test with wrong format of auth/login credentials
         data = ['Bad', 'data', 'format']
         data = json.dumps(data)
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid data format'})
         self.assertEqual(response.status_code, 400)
@@ -117,17 +117,17 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         self.assertEqual(data, {message: 'Cannot perform this operation'})
         self.assertEqual(response.status_code, 401)
 
-    def test_specific_order_put_authentication(self):
+    def test_deliver_authentication(self):
         """Tests PUT requests to api/v2/parcels/<id> with no token, invalid token or unauthorized user"""
         # Test with user token
         response = self.client.put(
-            'api/v2/parcels/100', headers=self.user_token_dict)
+            'api/v2/parcels/100/deliver', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Cannot perform this operation'})
         self.assertEqual(response.status_code, 401)
         # Test with invalid token
         response = self.client.put(
-            'api/v2/parcels/100', headers={'token': 'jonjffriu8u483u8384u82'})
+            'api/v2/parcels/100/deliver', headers={'token': 'jonjffriu8u483u8384u82'})
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid token'})
         self.assertEqual(response.status_code, 401)

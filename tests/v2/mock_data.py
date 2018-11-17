@@ -55,11 +55,11 @@ invalid_addr = {
 
 
 # Login credentials
-admin_login = {'email': 'jratcher@gmail.com',
-                    'password': 'ulembaya'}
+admin_login = {'username': 'admin',
+                    'password': 'password'}
 
-user_login = {'email': 'abby@gmail.com',
-                    'password': 'ulembaya'}
+user_login = {'username': 'dan',
+                    'password': 'password'}
 
 message = 'message'
 

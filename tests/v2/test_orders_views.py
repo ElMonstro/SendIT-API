@@ -10,28 +10,28 @@ class ParcelsTestCase(unittest.TestCase):
 
     def setUp(self):
         """Sets up test variables"""
-        self.app = create_app('test')
+        self.app = create_app(config='test')
         self.client = self.app.test_client(self)
         self.app.testing = True
         self.order = mock_data['order']
         data = json.dumps(mock_data['admin'])
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         self.admin_token_dict = json.loads(response.data)
         data = json.dumps(mock_data['user'])
         response = self.client.post(
-            'api/v2/login', content_type="application/json", data=data)
+            'api/v2/auth/login', content_type="application/json", data=data)
         self.user_token_dict = json.loads(response.data)
         self.client.post('api/v2/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
         self.client.post('api/v2/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
-
-    def tearDown(self):
-        """Destroy variables"""
-        drop_tables()
-
+        
+   # def tearDown(self):
+        """Clean out test space variables"""
+       # drop_tables()
 
 class GoodRequestTestCase(ParcelsTestCase):
     """This class tests views with valid requests"""
+   
 
     def test_create_order(self):
         """Tests good requests to POST /parcels"""
@@ -43,10 +43,10 @@ class GoodRequestTestCase(ParcelsTestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_admin_change_order_status(self):
-        """Tests PUT /parcels/<id>"""
+        """Tests PUT /parcels/<id>Cancel/"""
         # Test with the right auth token
         response = self.client.put(
-            'api/v2/parcels/100', headers=self.admin_token_dict)
+            'api/v2/parcels/1/deliver', headers=self.admin_token_dict)
         self.assertTrue('order' in json.loads(response.data))
         self.assertEqual(json.loads(response.data)['message'], 'Status changed')
         self.assertEqual(response.status_code, 200)
