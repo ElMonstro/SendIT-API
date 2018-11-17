@@ -91,8 +91,20 @@ class Users(DataBase):
 
 class Notification(DataBase):
     """Handles notification table operations"""
-    def get_user_notifications(self, id):
-        pass
+    def get_notifications(self, user_id):
+        """Get users notifications"""
+        query = """UPDATE notifications SET is_seen = FALSE WHERE user_id = {} 
+        RETURNING *;"""
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        created = result[5].replace(microsecond=0)
+        datestring = str(created)
+        notification = {
+            'notification_id': result[0],
+            'user_id': result[1],
+            'order_id': result[2],
+            'message': result[3],
+            'created': datestring
+        }
+        return notification
 
-    def get_admin_notifications(self):
-        pass
