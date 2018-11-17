@@ -85,8 +85,8 @@ class Orders(DataBase):
 
     def cancel_order(self, order_id, user_id):
         """Updates status column to cancelled"""
-        query = """UPDATE SET status='Canceled' where order_id = {};""".format(order_id)
-        query1 = """INSERT INTO notification (user_id, order_id, message) VALUES ({}, {}, 'Order canceled');""".format(user_id, order_id)
+        query = """UPDATE orders SET status = 'Canceled' WHERE order_id = {};""".format(order_id)
+        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Order canceled');""".format(user_id, order_id)
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()
@@ -94,8 +94,8 @@ class Orders(DataBase):
 
     def deliver_order(self, user_id, order_id):
         """Updates status column to delivered"""
-        query = """UPDATE SET status='Delivered' where order_id = {};""".format(order_id)
-        query1 = """INSERT INTO notification (user_id, order_id, message) VALUES ({}, {}, 'Parcel delivered');""".format(user_id, order_id)
+        query = """UPDATE orders SET status = 'Delivered' WHERE order_id = {};""".format(order_id)
+        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Parcel delivered');""".format(user_id, order_id)
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()
@@ -115,6 +115,14 @@ class Orders(DataBase):
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()
+
+    def get_order_status(self, order_id):
+        """Gets the order status"""
+        query = """SELECT status FROM orders WHERE order_id = {};""".format(order_id)
+        self.cursor.execute(query)
+        status = self.cursor.fetchone()
+        if status: status = status[0]
+        return status
 
 
 
