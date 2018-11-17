@@ -13,23 +13,25 @@ POSTGRES = {
 url = 'postgresql://{user}:{pw}@{host}:{port}/{db}' .format(**POSTGRES)
 
 def get_connection(url):
-    try:
-        conn = psycopg2.connect(url)
-    except psycopg2.OperationalError:
-        print('Connection failed')
+    """Creates and return connection"""
+    conn = psycopg2.connect(url)
     return conn
 
-def init_dbase():
-    try:
-        psycopg2.connect(url)
-    except psycopg2.OperationalError:
-        print('Connection failed')
+def init_dbase(url):
+    """Start database"""
+    psycopg2.connect(url)
+
     
 
 def create_tables(url):
+    """Create tabes"""
     queries = create_queries()
     conn = get_connection(url)
     cursor = conn.cursor()
+    db_name = url.split('/')[-1]
+    if db_name == 'test_db':
+        queries.pop()
+
     try:
         for query in queries:
             cursor.execute(query)
@@ -38,6 +40,7 @@ def create_tables(url):
     conn.commit()
 
 def drop_tables():
+    """Delete tables"""
     query = """DROP TABLE IF EXISTS users, orders, notifications CASCADE; """
     conn = get_connection(url)
     cursor = conn.cursor()
@@ -45,6 +48,7 @@ def drop_tables():
     conn.commit()
 
 def create_queries():
+    """Return queries"""
     user_table = """
         CREATE TABLE IF NOT EXISTS users(
         user_id SERIAL PRIMARY KEY,
