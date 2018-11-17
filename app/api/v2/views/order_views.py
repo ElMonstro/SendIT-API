@@ -77,14 +77,20 @@ class Parcel(Resource):
         message_dict = {}
         status_code = 200
         if not user_data['is_admin']:
-            return { message: 'Cannot perform this operation' }, 401
+            return { message: 'Cannot perform this operation' }, 400
         try:
             int_id = int(id)
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        if self.orders.is_order_there(int_id):
-            self.orders.deliver_order(user_data['user id'], int_id)
+        status = self.orders.get_order_status(int_id)
+
+        if status:
+            if status == 'Delivered':
+                return {message: 'Unsuccesful, order already delivered'}, 403
+            if status == 'Canceled':
+                return {message: 'Unsuccessful, order is canceled'}, 403
+            self.orders.deliver_order(user_data['user_id'], int_id)
             order_d = self.orders.get_order(int_id)
             message_dict = {message: 'Status changed', 'orders': order_d} 
         else:       
@@ -109,8 +115,15 @@ class CancelOrder(Resource):
             int_id = int(id)
         except ValueError:
             return {message: 'Wrong id format'}, 400
-
-        if self.orders.is_order_there(int_id):
+        
+        status = self.orders.get_order_status(int_id)
+            
+        if status:
+            if status == 'Delivered':
+                return {message: 'Unsuccesful, order already delivered'}, 403
+            if status == 'Canceled':
+                return {message: 'Unsuccessful, order is canceled'}, 403 
+            self.orders.cancel_order(int_id, user_data['user_id'])
             order_d = self.orders.get_order(int_id)
             message_dict = {message: 'Order canceled', 'order': order_d} 
         else:       
