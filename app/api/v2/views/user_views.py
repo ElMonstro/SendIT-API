@@ -24,11 +24,11 @@ class UserParcels(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        if user_data['user id'] == int(id) or user_data['is_admin']:
+        if user_data['user_id'] == int(id) or user_data['is_admin']:
             orders = self.orders.get_users_orders(int_id)
             if not orders:
                 return {message: 'No orders by that user'}, 400
-            return {'orders': orders}  
+            return {message: 'All user orders', 'orders': orders}  
         # If user not admin or his/her id is not equal to the user id are  trying to access
         return message_dict, status_code
 
