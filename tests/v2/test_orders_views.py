@@ -1,8 +1,10 @@
+import os
 import unittest
-from app import create_app, drop_tables
+from app import create_app
 import json
 from app.api.v2.models.user_models import Users
 from .mock_data import mock_data, message
+from app.db_config import delete_all_orders, get_connection, DbConnect
 
 
 class ParcelsTestCase(unittest.TestCase):
@@ -13,6 +15,7 @@ class ParcelsTestCase(unittest.TestCase):
         self.app = create_app(config='test')
         self.client = self.app.test_client(self)
         self.app.testing = True
+        self.db_conn = DbConnect()
         self.order = mock_data['order']
         data = json.dumps(mock_data['admin'])
         response = self.client.post(
@@ -22,12 +25,9 @@ class ParcelsTestCase(unittest.TestCase):
         response = self.client.post(
             'api/v2/auth/login', content_type="application/json", data=data)
         self.user_token_dict = json.loads(response.data)
-        self.client.post('api/v2/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
+       
         self.client.post('api/v2/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
         
-   # def tearDown(self):
-        """Clean out test space variables"""
-       # drop_tables()
 
 class GoodRequestTestCase(ParcelsTestCase):
     """This class tests views with valid requests"""
@@ -44,19 +44,22 @@ class GoodRequestTestCase(ParcelsTestCase):
 
     def test_admin_change_order_status(self):
         """Tests PUT /parcels/<id>Cancel/"""
+        self.client.post('api/v2/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
         # Test with the right auth token
+        last_rec = self.db_conn.get_last_record_id()
         response = self.client.put(
-            'api/v2/parcels/1/deliver', headers=self.admin_token_dict)
-        self.assertTrue('order' in json.loads(response.data))
+            'api/v2/parcels/{}/deliver'.format(last_rec), headers=self.admin_token_dict)
         self.assertEqual(json.loads(response.data)['message'], 'Status changed')
+        self.assertTrue('order' in json.loads(response.data))
         self.assertEqual(response.status_code, 200)
 
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
         # Test with the right auth token
         self.client.post('api/v2/parcels', data=json.dumps(mock_data['order']), headers=self.user_token_dict)
+        last_rec = self.db_conn.get_last_record_id()
         response = self.client.put(
-            'api/v2/parcels/100/cancel', headers=self.user_token_dict)
+            'api/v2/parcels/{}/cancel'.format(last_rec), headers=self.user_token_dict)
         self.assertTrue('order' in json.loads(response.data))
         self.assertEqual(json.loads(response.data)['message'], 'Order canceled')
         self.assertEqual(response.status_code, 200)
@@ -68,13 +71,14 @@ class GoodRequestTestCase(ParcelsTestCase):
             'api/v2/parcels', headers=self.admin_token_dict)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
+        self.assertEqual(data[message], 'All orders fetched')
         self.assertTrue('orders' in data)
 
     def test_get_all_orders_by_user(self):
         """Tests GET /users/<id>/parcels"""
         # Test with the right token
         response = self.client.get(
-            'api/v2/users/102/parcels', headers=self.user_token_dict)
+            'api/v2/users/2/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertTrue('orders' in data)
         self.assertEqual(response.status_code, 200)
@@ -82,11 +86,17 @@ class GoodRequestTestCase(ParcelsTestCase):
     def test_get_specific_order(self):
         """Tests GET /parcels/<id>"""
         # Test with right auth token
+        last_rec = self.db_conn.get_last_record_id()
         response = self.client.get(
-            'api/v2/parcels/100', headers=self.user_token_dict)
+            'api/v2/parcels/{}'.format(last_rec), headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('order' in data) 
+
+    def tearDown(self):
+        delete_all_orders(get_connection(os.getenv('DB_URL')))
+
+    
 
 
 class BadRequestTestCase(ParcelsTestCase):
@@ -96,7 +106,7 @@ class BadRequestTestCase(ParcelsTestCase):
         """Tests bad requests to POST /parcels"""
         # Test with wrong data type
         response = self.client.post('/api/v2/parcels',
-                                    data=json.dumps(['jay', 'bad', 'data']), content_type='application/json', headers=self.user_token_dict)
+            data=json.dumps(['jay', 'bad', 'data']), content_type='application/json', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data, {'message': 'Payload must be a dictionary(object)'})
@@ -123,14 +133,14 @@ class BadRequestTestCase(ParcelsTestCase):
         # Test unregistered id
         # Correct format but not there
         response = self.client.put(
-            'api/v2/parcels/35420', headers=self.admin_token_dict)
+            'api/v2/parcels/35420/deliver', headers=self.admin_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             data, {'message': 'No Parcel delivery order with that id'})
         # Test invalid format id
         response = self.client.put(
-            'api/v2/parcels/35uh420', headers=self.admin_token_dict)  # Incorrect id format
+            'api/v2/parcels/35uh420/deliver', headers=self.admin_token_dict)  # Incorrect id format
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data, {'message': 'Wrong id format'})
@@ -176,3 +186,7 @@ class BadRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'Wrong id format'})
         self.assertEqual(response.status_code, 400)
+
+    def tearDown(self):
+        delete_all_orders(get_connection(os.getenv('DB_URL')))
+
