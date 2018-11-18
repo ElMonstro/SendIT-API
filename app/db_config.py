@@ -3,15 +3,35 @@ import psycopg2
 from flask import current_app as app
 
 
-POSTGRES = {
-    'user': 'elmonstro',
-    'pw': "password",
-    'db': 'sendit',
-    'host': 'localhost',
-    'port': '5432',
-}
+class DbConnect:
+    def __init__(self):
+        self.DB_URL = os.getenv('DB_URL')
+        self.conn = get_connection(self.DB_URL)
+        self.cursor = self.conn.cursor()
 
-url = 'postgresql://{user}:{pw}@{host}:{port}/{db}' .format(**POSTGRES)
+    def create_tables(self, url):
+        """Create tabes"""
+        queries = create_queries()
+        try:
+            for query in queries:
+                self.cursor.execute(query)
+        except psycopg2.IntegrityError:
+            pass
+        self.conn.commit()
+    
+    def drop_tables(self):
+        """Delete tables"""
+        query = """DROP TABLE IF EXISTS users, orders, notifications CASCADE; """
+        self.cursor.execute(query)
+        self.conn.commit()
+
+    def get_last_record_id(self):
+        """Retuns the last record id"""
+        query = """SELECT order_id FROM orders order by order_id desc limit 1;"""
+        self.cursor.execute(query)
+        return self.cursor.fetchone()[0]
+
+    
 
 def get_connection(url):
     """Creates and return connection"""
@@ -25,30 +45,11 @@ def init_dbase(url):
 def delete_all_orders(conn):
     """Delete all from all"""
     query = """DELETE FROM orders"""
-    conn.cursor.execute(query)
-    conn.commit()
-
-def create_tables(url):
-    """Create tabes"""
-    queries = create_queries()
-    conn = get_connection(url)
-    cursor = conn.cursor()
-    db_name = url.split('/')[-1]
-    
-    try:
-        for query in queries:
-            cursor.execute(query)
-    except psycopg2.IntegrityError:
-        pass
-    conn.commit()
-
-def drop_tables(url=os.getenv('DB_URL')):
-    """Delete tables"""
-    query = """DROP TABLE IF EXISTS users, orders, notifications CASCADE; """
-    conn = get_connection(url)
     cursor = conn.cursor()
     cursor.execute(query)
     conn.commit()
+
+
 
 def create_queries():
     """Return queries"""
@@ -80,8 +81,8 @@ def create_queries():
     notifications = """
         CREATE TABLE IF NOT EXISTS notifications(
         notification_id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users ON DELETE SET NULL,
-        order_id INTEGER REFERENCES orders,
+        user_id INTEGER REFERENCES users,
+        order_id INTEGER REFERENCES orders ON DELETE SET NULL,
         message VARCHAR (50) NOT NULL,
         is_seen BOOL DEFAULT FALSE,
         created_on TIMESTAMP DEFAULT NOW()
@@ -94,3 +95,6 @@ def create_queries():
                 VALUES ('dan', 'password', 'dan@gmail.com', False);"""
 
     return [user_table, order_table, notifications, create_admin, create_user]
+
+if __name__ == '__main__':
+    delete_all_orders(get_connection(os.getenv('DB_URL')))
