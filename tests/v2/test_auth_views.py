@@ -38,7 +38,12 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
             'api/v2/auth/signup', content_type="application/json", data=data)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['message'], 'User registered')
         self.assertTrue('token' in data)
+
+    def tearDown(self):
+        """Delete user records"""
+        self.db_conn.delete_latest_user()
 
     
 
@@ -101,6 +106,10 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid data format'})
         self.assertEqual(response.status_code, 400)
+
+    def test_register(self):
+        """Test bad request to route /auth/signup"""
+        pass
 
     def test_create_parcel_authentication(self):
         """Tests POST requests to api/v2/parcels with no token, invalid token or unauthorized user"""
