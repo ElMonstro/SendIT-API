@@ -135,7 +135,7 @@ class DeliverOrder(Resource):
                 return {message: 'Unsuccessful, order is canceled'}, 403
             self.orders.deliver_order(user_data['user_id'], int_id)
             order_d = self.orders.get_order(int_id)
-            message_dict = {message: 'Status changed', 'orders': order_d} 
+            message_dict = {message: 'Status changed', 'order': order_d} 
         else:       
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400

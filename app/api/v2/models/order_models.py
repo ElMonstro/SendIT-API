@@ -1,7 +1,6 @@
 
 from app.api.v2.utils.validators import Validator
 from .user_models import DataBase
-from app.db_config import drop_tables, create_tables
 
 message = 'message'
 
@@ -27,7 +26,8 @@ class Orders(DataBase):
         query = """SELECT order_id, user_id, pickup, dest, current_location, weight, status, recepient_no, recepient_name  FROM orders WHERE order_id = {};""".format(order_id)
         self.cursor.execute(query)
         order = self.cursor.fetchone()
-        order_dict = {
+        if order:
+            order_dict = {
                     'order_id': order[0],
                     'user_id': order[1],
                     'pickup': order[2],
@@ -39,7 +39,8 @@ class Orders(DataBase):
                     'recepient_name': order[8]
 
                 }
-        return order_dict
+            return order_dict
+        return False
 
     def get_all_orders(self):
         """Gets all orders"""
