@@ -2,12 +2,12 @@ from flask import request
 from flask_restful  import Resource
 import jwt
 import datetime
-from instance.config import DevelopmentConfig
+from config import Config
 from functools import wraps
 from app.api.utils.validators import Validator
 from app.api.v2.models.user_models import Users
 
-secret = DevelopmentConfig.SECRET
+secret = Config.SECRET
 
 message = 'message'
 
@@ -58,3 +58,39 @@ class Login(Resource):
         # If there is no authentication information
         return message_dict, status_code
 
+
+class Register(Resource):
+    """Register users"""
+    def __init__(self):
+        self.auth = request.get_json()
+        self.validator = Validator()
+        self.users = Users()
+    
+    def post(self):
+        try:
+            username = self.auth['username']                
+        except TypeError:
+            return {message: 'Invalid data format'}, 400
+        except KeyError:
+            return {message: 'Username not provided'}, 400  
+        try:
+            password = self.auth['password']               
+        except KeyError:
+            return {message: 'Password not provided'}, 400          
+        try:
+            email = self.auth['email']                
+        except KeyError:
+            return {message: 'Email not provided'}, 400
+       
+
+        user_dict = {'username': username, 'password': password, 'email': email}
+        user_id = self.users.add_user(user_dict)
+        if not user_id:
+            return {message: 'Username or email already used'}
+
+        exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        payload = { 'user_id':user_id, 'exp': exp}
+        token = jwt.encode(payload, key=secret, ) 
+        return {
+            message: 'User registered',
+            'token': token.decode('utf-8')}

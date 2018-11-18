@@ -29,6 +29,9 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
 
+class TestRegister(ParcelsTestCase):
+    """Test valid request to /auth/sighnup"""
+
     def test_register(self):
         """Tests good requests to POST auth/register"""
         # Register write data
