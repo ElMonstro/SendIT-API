@@ -4,7 +4,7 @@ from app import create_app
 import json
 from app.api.v2.models.user_models import Users
 from .mock_data import mock_data, message
-from app.db_config import delete_all_orders, get_connection, DbConnect
+from app.db_config import DbConnect
 
 
 class ParcelsTestCase(unittest.TestCase):
@@ -94,7 +94,8 @@ class GoodRequestTestCase(ParcelsTestCase):
         self.assertTrue('order' in data) 
 
     def tearDown(self):
-        delete_all_orders(get_connection(os.getenv('DB_URL')))
+        """Clear database records"""
+        self.db_conn.delete_all_orders()
 
     
 
@@ -188,5 +189,6 @@ class BadRequestTestCase(ParcelsTestCase):
         self.assertEqual(response.status_code, 400)
 
     def tearDown(self):
-        delete_all_orders(get_connection(os.getenv('DB_URL')))
+        """Clear database records"""
+        self.db_conn.delete_all_orders()
 
