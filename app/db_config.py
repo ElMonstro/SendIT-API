@@ -42,7 +42,10 @@ class DbConnect:
         query = """SELECT user_id FROM users order by user_id desc limit 1;"""
         self.cursor.execute(query)
         user_id = self.cursor.fetchone()[0]
-        query = """DELETE FROM users WHERE user_id = {}""".format(user_id)
+        query = """DELETE FROM users WHERE user_id = {};""".format(user_id)
+        self.cursor.execute(query)
+        self.conn.commit()
+
 
 
 
@@ -105,4 +108,4 @@ def create_queries():
     return [user_table, order_table, notifications, create_admin, create_user]
 
 if __name__ == '__main__':
-    DbConnect().delete_latest_user()
+    print(DbConnect().delete_latest_user())
