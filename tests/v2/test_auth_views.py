@@ -30,23 +30,17 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         self.assertTrue('token' in data)
 
     def test_register(self):
-        """Tests good requests to POST auth/login"""
-        # Admin login
-        data = mock_data['admin']
+        """Tests good requests to POST auth/register"""
+        # Register write data
+        data = mock_data['register']
         data = json.dumps(data)
         response = self.client.post(
-            'api/v2/auth/login', content_type="application/json", data=data)
+            'api/v2/auth/signup', content_type="application/json", data=data)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
-        # User login
-        data = mock_data['user']
-        data = json.dumps(data)
-        response = self.client.post(
-            'api/v2/auth/login', content_type="application/json", data=data)
-        data = json.loads(response.data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('token' in data)
+
+    
 
     
 

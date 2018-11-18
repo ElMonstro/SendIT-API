@@ -89,5 +89,6 @@ mock_data = {
     'invalid_data': invalid_data,
     'invalid_addr': invalid_addr,
     'invalid_tel': invalid_tel,
-    'bad_name': bad_name
+    'bad_name': bad_name,
+    'register': user_register
 }
