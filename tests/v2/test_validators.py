@@ -1,0 +1,40 @@
+import unittest
+from run import app
+import json
+from app.api.v2.models.user_models import Users
+from .mock_data import mock_data, message
+from app.api.v2.utils.validators import Validator
+
+class ValidatorsTestCase(unittest.TestCase):
+    """Tests edge cases"""
+
+    def setUp(self):
+        """Set up test variables"""
+        self.validator = Validator()
+        self.users = Users()
+
+    def test_order_post_data_validator(self):
+        """Tests order_list_validator"""
+        order_list_validator = self.validator.order_list_validator
+        good_data = mock_data['order']
+       
+        # Test with good data
+        valid = order_list_validator(good_data)
+        self.assertEqual(valid, True)
+        message = 'message'
+        # Test with bad data
+        res_message = order_list_validator(mock_data['bad_key'])
+        self.assertEqual(res_message, {message: 'One or more of object keys is invalid'})
+        res_message = order_list_validator(mock_data['invalid_addr'])
+        self.assertEqual(res_message, {message: 'Addresses should be eight digits'}  )
+        res_message = order_list_validator(mock_data['less'])
+        self.assertEqual(res_message, {message: 'Invalid number of order details'} )
+        res_message = order_list_validator(mock_data['invalid_tel'])
+        self.assertEqual(res_message, {message: 'Phone number must have ten digits'} )
+        res_message = order_list_validator(mock_data['invalid_data'])
+        self.assertEqual(res_message, {message: 'Wrong data type on one or more details'})
+        res_message = order_list_validator(mock_data['bad_name'])
+        self.assertEqual(res_message, {message: 'Receipient name too short'})
+        # Add test
+
+

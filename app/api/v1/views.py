@@ -166,6 +166,7 @@ class Login(Resource):
         self.users = Users()
 
     def post(self):
+        """Handles POST requests to /login"""
         message_dict = {message: 'Email and password required'}
         status_code = 400
         if self.auth:
