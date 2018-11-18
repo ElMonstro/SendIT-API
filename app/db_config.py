@@ -105,4 +105,4 @@ def create_queries():
     return [user_table, order_table, notifications, create_admin, create_user]
 
 if __name__ == '__main__':
-    delete_all_orders(get_connection(os.getenv('DB_URL')))
+    DbConnect().delete_latest_user()
