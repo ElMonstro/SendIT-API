@@ -22,7 +22,11 @@ def init_dbase(url):
     """Start database"""
     psycopg2.connect(url)
 
-    
+def delete_all_orders(conn):
+    """Delete all from all"""
+    query = """DELETE FROM orders"""
+    conn.cursor.execute(query)
+    conn.commit()
 
 def create_tables(url):
     """Create tabes"""
@@ -76,7 +80,7 @@ def create_queries():
     notifications = """
         CREATE TABLE IF NOT EXISTS notifications(
         notification_id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users,
+        user_id INTEGER REFERENCES users ON DELETE SET NULL,
         order_id INTEGER REFERENCES orders,
         message VARCHAR (50) NOT NULL,
         is_seen BOOL DEFAULT FALSE,
