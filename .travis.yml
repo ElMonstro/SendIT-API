@@ -2,7 +2,7 @@ language:
       - python
 env:
       - CC_TEST_REPORTER_ID=873429bec9fd50de3f9c12a9ff621f5a560d04d2ef28e9f6d15bd00c9ba598d5
-      - DB_URL=postgresql://postgres@localhost42:5432/test_db
+      - DB_URL=postgresql://postgres@localhost:5432/test_db
 
 python:
       - 3.6
