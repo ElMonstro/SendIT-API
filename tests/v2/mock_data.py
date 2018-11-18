@@ -57,7 +57,11 @@ bad_name = {
 }
 
 
-
+user_register = {
+    'username': 'Emm',
+    'email': 'emm@gmail.com',
+    'password': 'password'
+}
 
 
 
