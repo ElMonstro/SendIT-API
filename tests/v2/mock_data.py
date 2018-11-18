@@ -48,6 +48,14 @@ invalid_addr = {
  "dest": 1234678 
 }
 
+bad_name = { 
+ "weight": 3,
+ "recepient_name": "Ma",
+ "recepient_no": 726404622,
+ "pickup": 13456708,
+ "dest": 1234678 
+}
+
 
 
 
@@ -76,5 +84,6 @@ mock_data = {
     'less': less_keys,
     'invalid_data': invalid_data,
     'invalid_addr': invalid_addr,
-    'invalid_tel': invalid_tel
+    'invalid_tel': invalid_tel,
+    'bad_name': bad_name
 }
