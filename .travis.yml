@@ -2,7 +2,7 @@ language:
       - python
 env:
       - CC_TEST_REPORTER_ID=873429bec9fd50de3f9c12a9ff621f5a560d04d2ef28e9f6d15bd00c9ba598d5
-      - DB_URL=postgresql://postgres@localhost:5432/test_db
+
 
 python:
       - 3.6
@@ -24,6 +24,7 @@ before_script:
       - chmod +x ./cc-test-reporter
       - ./cc-test-reporter before-build
       - psql -c 'create database test_db;' -U postgres
+      - export DB_URL='postgresql://postgres@localhost:5432/test_db'
 script:
       - pytest --cov
 after_script:
