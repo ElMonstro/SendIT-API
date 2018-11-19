@@ -1,7 +1,12 @@
+import re
+from validate_email import validate_email
+from app.api.v2.models.user_models import Users
 message = 'message'
 
 class Validator:
     """Validates incoming data"""
+    def __init__(self):
+        self.users = Users()
 
     def order_list_validator(self, order):
         """Check validity of parcels POST data"""
@@ -23,3 +28,60 @@ class Validator:
         if not order['recepient_name'].isalpha():
             return {message: 'Receipient name must be in letters'}        
         return True
+
+    def password_validator(self, password):
+        """Validates password"""
+        is_valid = True
+        while True:
+            if not len(password) > 8:
+                is_valid = 'Password must have eight characters'
+                break
+            if not re.search('[a-z]', password):
+                is_valid = 'Password must have a lowercase character'
+                break
+            if not re.search('[A-Z]', password):
+                is_valid = 'Password must have an uppercase character'
+                break
+            if not re.search('[0-9]', password):
+                is_valid = 'Password must have a number'
+            if not re.search('[_@*#%!&$]', password):
+                is_valid = 'Password must have one of this: _@*%!&$'
+            else: break
+        return is_valid
+    
+    def username_email_validator(self, username, email, user_dict):
+        """Validates username and email"""
+        response = True
+        users_details = user_dict
+        while True:
+            if username in users_details['usernames']:
+                response = "Username already taken"
+                break
+            if email in users_details['emails']:
+                response = "Email already used to register"
+                break
+            if not validate_email(email):
+                response = "Email invalid"
+                break
+            if len(username) < 4: 
+                response = "Username cannot be less than four characters"
+                break
+            if re.search('^[A-Za-z]', username):
+                response = "Username must start with a letter"
+                break
+            if re.search('[@*#%!&$]', username):
+                response = "Username cannot have this characters: @*#%!&$"
+                break
+            else: break
+        return response
+            
+
+
+
+
+
+
+
+#x = Validator().password_validator('Joshu@aE5mm')
+#print(x)
+    
