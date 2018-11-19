@@ -1,13 +1,10 @@
 import re
 from validate_email import validate_email
-from app.api.v2.models.user_models import Users
+
 message = 'message'
 
 class Validator:
     """Validates incoming data"""
-    def __init__(self):
-        self.users = Users()
-
     def order_list_validator(self, order):
         """Check validity of parcels POST data"""
         keys = ['pickup', 'dest', 'recepient_name', 'recepient_no', 'weight']
@@ -33,7 +30,7 @@ class Validator:
         """Validates password"""
         is_valid = True
         while True:
-            if not len(password) > 8:
+            if len(password) < 8:
                 is_valid = 'Password must have eight characters'
                 break
             if not re.search('[a-z]', password):
@@ -44,8 +41,13 @@ class Validator:
                 break
             if not re.search('[0-9]', password):
                 is_valid = 'Password must have a number'
+                break
             if not re.search('[_@*#%!&$]', password):
                 is_valid = 'Password must have one of this: _@*%!&$'
+                break
+            if re.search('\s', password):
+                is_valid = "Password cannot have spaces"
+                break
             else: break
         return is_valid
     
@@ -57,23 +59,28 @@ class Validator:
             if username in users_details['usernames']:
                 response = "Username already taken"
                 break
-            if email in users_details['emails']:
+            elif email in users_details['emails']:
                 response = "Email already used to register"
                 break
-            if not validate_email(email):
+            elif not validate_email(email):
                 response = "Email invalid"
                 break
-            if len(username) < 4: 
+            elif len(username) < 4: 
                 response = "Username cannot be less than four characters"
                 break
-            if re.search('^[A-Za-z]', username):
+            elif not re.search('^[A-Za-z]', username):
                 response = "Username must start with a letter"
                 break
-            if re.search('[@*#%!&$]', username):
+            elif re.search('[@*#%!&$]', username):
                 response = "Username cannot have this characters: @*#%!&$"
                 break
+            elif re.search('\s', username):
+                response = "Username cannot have spaces"
+                break
             else: break
+
         return response
+
             
 
 
