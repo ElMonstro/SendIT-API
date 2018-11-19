@@ -52,6 +52,21 @@ class Users(DataBase):
         return users_dict
 
 
+    def get_all_username_emails(self):
+        """Fetches all usernames and emails"""
+        query = """SELECT username, email FROM users;"""
+        self.cursor.execute(query)
+        users = self.cursor.fetchall()
+        user_dict = {'usernames': [], 'emails': []}
+        if users:
+            for user in users:
+                user_dict['usernames'].append(user[0])
+                user_dict['emails'].append(user[1])
+        return user_dict
+
+
+
+
     def check_password(self, username, password):
         """Check if credentials are right"""
         query = """SELECT  password FROM users WHERE username = '{}';""".format(username)
@@ -83,6 +98,10 @@ class Users(DataBase):
         if admin: 
             return admin[0]
         return False
+    
+    def __del__(self):
+        """destroy object"""
+        self.cursor.close()
     
 
     
