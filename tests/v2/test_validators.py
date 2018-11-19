@@ -37,7 +37,7 @@ class ValidatorsTestCase(unittest.TestCase):
         self.assertEqual(res_message, {message: 'Receipient name too short'})
         # Add test
 
-    def test_password_validator(self):
+    def g_test_password_validator(self):
         """Test the password validator"""
         # Test with bad passwords
         pass_validator = self.validator.password_validator 
@@ -55,6 +55,40 @@ class ValidatorsTestCase(unittest.TestCase):
         # Test with good password
         is_valid = pass_validator(mock_data['good_pass'])
         self.assertEqual(is_valid, True)
+
+
+    def test_email_username_validator(self):
+        """Test the email and username validator"""
+        # Test with good data
+        validator = self.validator.username_email_validator
+        resp = validator('moracha', 'moracha@gmail.com', mock_data['user_dets'])
+        self.assertTrue(resp)
+        # Test with bad data
+        # Registered username
+        validator = self.validator.username_email_validator
+        resp = validator(mock_data['reg_usernm'], 'moracha@gmail.com', mock_data['user_dets'])
+        self.assertEqual(resp, "Username already taken")
+        # Registered email
+        validator = self.validator.username_email_validator
+        resp = validator('moracha', mock_data['reg_email'], mock_data['user_dets'])
+        self.assertEqual(resp, "Email already used to register")
+        # invalid email
+        validator = self.validator.username_email_validator
+        resp = validator('moracha', mock_data['bad_email'], mock_data['user_dets'])
+        self.assertEqual(resp, "Email invalid")
+        # username less than four characters
+        validator = self.validator.username_email_validator
+        resp = validator('moa', 'josh@gmail.com', mock_data['user_dets'])
+        self.assertEqual(resp, "Username cannot be less than four characters")
+        # username with characters
+        validator = self.validator.username_email_validator
+        resp = validator('mo$#@a', 'josh@gmail.com', mock_data['user_dets'])
+        self.assertEqual(resp, "Username cannot have this characters: @*#%!&$")
+
+
+        
+
+
 
         
 

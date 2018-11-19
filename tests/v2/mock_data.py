@@ -58,13 +58,29 @@ bad_name = {
 
 
 user_register = {
-    'username': 'Emm',
+    'username': 'Eminem',
     'email': 'emm@gmail.com',
     'password': 'P@ssw1rds'
 }
 
-bad_passwords = ['fssa', '4243FA$E', '@sfsfsfvs', 'fngGfeHs', 'Good5stuff']
+bad_passwords = ['fssa', 'VEVEVFA$E', '@sfsfsfvs', 'fngGfeHs', 'Good5stuff']
 good_password = 'Josh!elmon5tr0'
+
+user_details = {
+    'emails': ['jratcher@gmail.com', 'abby@gmail.com'],
+    'usernames': ['admin', 'jay', 'abby']
+}
+
+# mock usernames
+registered_username = 'admin'
+number_first_usern = '4gasv'
+symbol_usern = 'vsgs$s'
+less_char = 'sg'
+# mock emails
+reg_email = 'jratcher@gmail.com'
+bad_email = 'j.com'
+
+
 
 
 
@@ -83,6 +99,12 @@ expired_token =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtY
 
 
 mock_data = {
+    'user_dets': user_details,
+    'reg_usernm': registered_username,
+    'no_first': number_first_usern,
+    'sym_user': symbol_usern,
+    'reg_email': reg_email,
+    'bad_email': bad_email,
     'order': order,
     'expired': expired_token,
     'admin': admin_login,
@@ -95,5 +117,5 @@ mock_data = {
     'bad_name': bad_name,
     'register': user_register,
     'bad_pass': bad_passwords,
-    'good_pass': good_password
+    'good_pass': good_password,
 }
