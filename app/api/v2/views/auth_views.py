@@ -1,3 +1,4 @@
+from validate_email import validate_email
 from flask import request
 from flask_restful  import Resource
 import jwt
@@ -81,6 +82,9 @@ class Register(Resource):
             email = self.auth['email']                
         except KeyError:
             return {message: 'Email not provided'}, 400
+
+        if not validate_email(email):
+            return {message: 'Invalid email'}, 400
        
 
         user_dict = {'username': username, 'password': password, 'email': email}
