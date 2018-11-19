@@ -40,8 +40,8 @@ class TestRegister(ParcelsTestCase):
         response = self.client.post(
             'api/v2/auth/signup', content_type="application/json", data=data)
         data = json.loads(response.data)
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(data['message'], 'User registered')
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
 
     def tearDown(self):
