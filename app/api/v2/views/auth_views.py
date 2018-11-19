@@ -5,7 +5,7 @@ import jwt
 import datetime
 from config import Config
 from functools import wraps
-from app.api.utils.validators import Validator
+from app.api.v2.utils.validators import Validator
 from app.api.v2.models.user_models import Users
 
 secret = Config.SECRET
@@ -83,8 +83,15 @@ class Register(Resource):
         except KeyError:
             return {message: 'Email not provided'}, 400
 
-        if not validate_email(email):
-            return {message: 'Invalid email'}, 400
+        usernames_emails = self.users.get_all_username_emails()
+        response = self.validator.username_email_validator(username, email,usernames_emails)
+        # Check if email and password are valid
+        if response != True:
+            return {message, response}, 400
+
+        is_valid = self.validator.password_validator(password)
+        if is_valid != True: 
+            return {message: is_valid}, 400
        
 
         user_dict = {'username': username, 'password': password, 'email': email}
