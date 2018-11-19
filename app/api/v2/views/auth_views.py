@@ -87,7 +87,7 @@ class Register(Resource):
         response = self.validator.username_email_validator(username, email,usernames_emails)
         # Check if email and password are valid
         if response != True:
-            return {message, response}, 400
+            return {message: response}, 400
 
         is_valid = self.validator.password_validator(password)
         if is_valid != True: 
