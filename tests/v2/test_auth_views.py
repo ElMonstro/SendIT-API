@@ -5,12 +5,13 @@ from app.api.v2.models.user_models import Users
 from .mock_data import mock_data, message
 from .test_orders_views import ParcelsTestCase
 from app.api.v2.utils.validators import Validator
+from app.db_config import DbConnect
 
 class AuthGoodRequestTestCase(ParcelsTestCase):
     """Tests requests with valid authenticaton"""
 
     def test_login(self):
-        """Tests good requests to POST /login"""
+        """Tests good requests to POST auth/login"""
         # Admin login
         data = mock_data['admin']
         data = json.dumps(data)
@@ -27,6 +28,29 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
+
+class TestRegister(ParcelsTestCase):
+    """Test valid request to /auth/sighnup"""
+
+    def test_register(self):
+        """Tests good requests to POST auth/register"""
+        # Register write data
+        data = mock_data['register']
+        data = json.dumps(data)
+        response = self.client.post(
+            'api/v2/auth/signup', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'User registered')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('token' in data)
+
+    def tearDown(self):
+        """Delete user records"""
+        self.db_conn.delete_latest_user()
+
+    
+
+    
 
 
 class AuthBadRequestTestCase(ParcelsTestCase):
@@ -85,6 +109,10 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid data format'})
         self.assertEqual(response.status_code, 400)
+
+    def test_register(self):
+        """Test bad request to route /auth/signup"""
+        pass
 
     def test_create_parcel_authentication(self):
         """Tests POST requests to api/v2/parcels with no token, invalid token or unauthorized user"""

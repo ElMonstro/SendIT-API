@@ -31,6 +31,24 @@ class DbConnect:
         self.cursor.execute(query)
         return self.cursor.fetchone()[0]
 
+    def delete_all_orders(self):
+        """Delete all from all"""
+        query = """DELETE FROM orders"""
+        self.cursor.execute(query)
+        self.conn.commit()
+    
+    def delete_latest_user(self):
+        """Delete latest user"""
+        query = """SELECT user_id FROM users order by user_id desc limit 1;"""
+        self.cursor.execute(query)
+        user_id = self.cursor.fetchone()[0]
+        query = """DELETE FROM users WHERE user_id = {};""".format(user_id)
+        self.cursor.execute(query)
+        self.conn.commit()
+
+
+
+
     
 
 def get_connection(url):
@@ -41,13 +59,6 @@ def get_connection(url):
 def init_dbase(url):
     """Start database"""
     psycopg2.connect(url)
-
-def delete_all_orders(conn):
-    """Delete all from all"""
-    query = """DELETE FROM orders"""
-    cursor = conn.cursor()
-    cursor.execute(query)
-    conn.commit()
 
 
 
@@ -97,4 +108,4 @@ def create_queries():
     return [user_table, order_table, notifications, create_admin, create_user]
 
 if __name__ == '__main__':
-    delete_all_orders(get_connection(os.getenv('DB_URL')))
+    print(DbConnect().delete_latest_user())

@@ -20,21 +20,20 @@ class DataBase:
 class Users(DataBase):
     """Handles user table db operations"""
     def add_user(self,user_dict):
-        """Inserts user data into user table"""
-        is_succesful = True        
+        """Inserts user data into user table"""      
         query = """INSERT INTO users (username, password, email)
-                VALUES ('{username}', '{password}', '{email}');""".format(**user_dict)
+                VALUES ('{username}', '{password}', '{email}') RETURNING user_id;""".format(**user_dict)
         try:
             self.cursor.execute(query)
-            self.conn.commit()
+            self.conn.commit()            
         except psycopg2.IntegrityError:
-            is_succesful = False
-        return is_succesful
+            return False
+        return self.cursor.fetchone()[0]
 
 
 
     def get_user(self, username):
-        query = """SELECT  user_id, username, email, is_admin FROM users WHERE username = {};""".format(username)
+        query = """SELECT  user_id, username, email, is_admin FROM users WHERE username = '{}';""".format(username)
         self.cursor.execute(query)
         user = self.cursor.fetchone()
         user_dict = {user[0]: [user[1], user[2], user[3]],}
@@ -51,6 +50,21 @@ class Users(DataBase):
             for user in users:
                 users_dict[user[0]] = [user[1], user[2], user[3]]
         return users_dict
+
+
+    def get_all_username_emails(self):
+        """Fetches all usernames and emails"""
+        query = """SELECT username, email FROM users;"""
+        self.cursor.execute(query)
+        users = self.cursor.fetchall()
+        user_dict = {'usernames': [], 'emails': []}
+        if users:
+            for user in users:
+                user_dict['usernames'].append(user[0])
+                user_dict['emails'].append(user[1])
+        return user_dict
+
+
 
 
     def check_password(self, username, password):
@@ -84,6 +98,10 @@ class Users(DataBase):
         if admin: 
             return admin[0]
         return False
+    
+    def __del__(self):
+        """destroy object"""
+        self.cursor.close()
     
 
     

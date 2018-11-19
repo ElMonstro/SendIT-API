@@ -1,3 +1,4 @@
+import re
 message = 'message'
 
 class Validator:
@@ -18,4 +19,4 @@ class Validator:
             return {message: 'Phone number must have ten digits'}
         if not len(str(order['pickup'])) == 8 and not len(str(order['dest'])) == 8:
             return {message: 'Addresses should be eight digits'}        
-        return True
+        return True        
