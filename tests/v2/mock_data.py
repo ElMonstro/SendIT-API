@@ -60,8 +60,11 @@ bad_name = {
 user_register = {
     'username': 'Emm',
     'email': 'emm@gmail.com',
-    'password': 'password'
+    'password': 'P@ssw1rds'
 }
+
+bad_passwords = ['fssa', '4243FA$E', '@sfsfsfvs', 'fngGfeHs', 'Good5stuff']
+good_password = 'Josh!elmon5tr0'
 
 
 
@@ -90,5 +93,7 @@ mock_data = {
     'invalid_addr': invalid_addr,
     'invalid_tel': invalid_tel,
     'bad_name': bad_name,
-    'register': user_register
+    'register': user_register,
+    'bad_pass': bad_passwords,
+    'good_pass': good_password
 }

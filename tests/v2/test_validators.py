@@ -37,4 +37,24 @@ class ValidatorsTestCase(unittest.TestCase):
         self.assertEqual(res_message, {message: 'Receipient name too short'})
         # Add test
 
+    def test_password_validator(self):
+        """Test the password validator"""
+        # Test with bad passwords
+        pass_validator = self.validator.password_validator 
+        pass_list = mock_data['bad_pass']
+        is_valid = pass_validator(pass_list[0])
+        self.assertEqual(is_valid, 'Password must have eight characters')
+        is_valid = pass_validator(pass_list[1])
+        self.assertEqual(is_valid, 'Password must have a lowercase character')
+        is_valid = pass_validator(pass_list[2])
+        self.assertEqual(is_valid, 'Password must have an uppercase character')
+        is_valid = pass_validator(pass_list[3])
+        self.assertEqual(is_valid, 'Password must have a number')
+        is_valid = pass_validator(pass_list[4])
+        self.assertEqual(is_valid, 'Password must have one of this: _@*%!&$')
+        # Test with good password
+        is_valid = pass_validator(mock_data['good_pass'])
+        self.assertEqual(is_valid, True)
+
+        
 
