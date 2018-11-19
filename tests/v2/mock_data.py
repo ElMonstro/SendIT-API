@@ -63,7 +63,7 @@ user_register = {
     'password': 'P@ssw1rds'
 }
 
-bad_passwords = ['fssa', 'VEVEVFA$E', '@sfsfsfvs', 'fngGfeHs', 'Good5stuff']
+bad_passwords = ['fssa', 'VEVEVFA$E', '@sfsfsfvs', 'fngGfeHs', 'Good5stuff', 'Jratcher$ f34']
 good_password = 'Josh!elmon5tr0'
 
 user_details = {
@@ -76,6 +76,7 @@ registered_username = 'admin'
 number_first_usern = '4gasv'
 symbol_usern = 'vsgs$s'
 less_char = 'sg'
+space_usernm = 'dfa affa'
 # mock emails
 reg_email = 'jratcher@gmail.com'
 bad_email = 'j.com'
@@ -99,6 +100,7 @@ expired_token =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtY
 
 
 mock_data = {
+    'space_usnm': space_usernm,
     'user_dets': user_details,
     'reg_usernm': registered_username,
     'no_first': number_first_usern,

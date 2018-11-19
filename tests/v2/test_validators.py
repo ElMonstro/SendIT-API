@@ -37,7 +37,7 @@ class ValidatorsTestCase(unittest.TestCase):
         self.assertEqual(res_message, {message: 'Receipient name too short'})
         # Add test
 
-    def g_test_password_validator(self):
+    def test_password_validator(self):
         """Test the password validator"""
         # Test with bad passwords
         pass_validator = self.validator.password_validator 
@@ -52,6 +52,8 @@ class ValidatorsTestCase(unittest.TestCase):
         self.assertEqual(is_valid, 'Password must have a number')
         is_valid = pass_validator(pass_list[4])
         self.assertEqual(is_valid, 'Password must have one of this: _@*%!&$')
+        is_valid = pass_validator(pass_list[5])
+        self.assertEqual(is_valid, 'Password cannot have spaces')
         # Test with good password
         is_valid = pass_validator(mock_data['good_pass'])
         self.assertEqual(is_valid, True)
@@ -82,8 +84,8 @@ class ValidatorsTestCase(unittest.TestCase):
         self.assertEqual(resp, "Username cannot be less than four characters")
         # username with characters
         validator = self.validator.username_email_validator
-        resp = validator('mo$#@a', 'josh@gmail.com', mock_data['user_dets'])
-        self.assertEqual(resp, "Username cannot have this characters: @*#%!&$")
+        resp = validator(mock_data['space_usnm'], 'josh@gmail.com', mock_data['user_dets'])
+        self.assertEqual(resp, "Username cannot have spaces")
 
 
         
