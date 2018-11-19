@@ -1,3 +1,4 @@
+import re
 message = 'message'
 
 class Validator:
@@ -19,3 +20,30 @@ class Validator:
         if not len(str(order['pickup'])) == 8 and not len(str(order['dest'])) == 8:
             return {message: 'Addresses should be eight digits'}        
         return True
+
+    def password_validator(self, password):
+        """Validates password"""
+        is_valid = True
+        while True:
+            if len(password) < 8:
+                is_valid = False
+                break
+            elif not re.search('[a-z]', password):
+                is_valid = False
+                break
+            elif not re.search('[A-Z]', password):
+                is_valid = False
+                break
+            elif not re.search('[0-9]', password):
+                is_valid = False
+                break
+            elif not re.search('[_@$]', password):
+                is_valid = False
+                break
+            else: break
+        
+        return is_valid
+
+
+
+        
