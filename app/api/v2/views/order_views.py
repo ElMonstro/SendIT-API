@@ -113,6 +113,7 @@ class DeliverOrder(Resource):
 
     def __init__(self):
         self.orders = Orders()
+        self.validators = Validator()
 
     @authenticate
     def put(self, id, user_data):
@@ -129,13 +130,13 @@ class DeliverOrder(Resource):
         status = self.orders.get_order_status(int_id)
 
         if status:
-            if status == 'Delivered':
-                return {message: 'Unsuccesful, order already delivered'}, 403
-            if status == 'Canceled':
-                return {message: 'Unsuccessful, order is canceled'}, 403
-            self.orders.deliver_order(user_data['user_id'], int_id)
-            order_d = self.orders.get_order(int_id)
-            message_dict = {message: 'Status changed', 'order': order_d} 
+            response = self.validators.status_validator(status)
+            if response == True:
+                self.orders.deliver_order(user_data['user_id'], int_id)
+                order_d = self.orders.get_order(int_id)
+                message_dict = {message: 'Status changed', 'order': order_d}
+            else:
+                return {message: response}, 403 
         else:       
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
@@ -146,6 +147,7 @@ class ChangeCurrentLocation(Resource):
     """Handles the route parcels/<parcel-id>/PresentLocation"""
     def __init__(self):
         self.orders = Orders()
+        self.validators = Validator()
 
     @authenticate
     def put(self, id, user_data):
@@ -165,17 +167,18 @@ class ChangeCurrentLocation(Resource):
         except KeyError:
             return {message: 'curr_location key not in object'}
         except TypeError:
-            {message: 'Current Location must be an object'}
+            return {message: 'Current Location must be an object'}
 
         status = self.orders.get_order_status(int_id)
 
         if status:
-            if status == 'Delivered':
-                return {message: 'Unsuccesful, order already delivered'}, 403
-            if status == 'Canceled':
-                return {message: 'Unsuccessful, order is canceled'}, 403
-            self.orders.change_current_loc(user_data['user_id'], int_id, curr_loc)
-            return {message: 'Present Location changed'}
+            response = self.validators.status_validator(status)
+            if response == True:
+                self.orders.change_current_loc(user_data['user_id'],int_id, curr_loc)
+                order_d = self.orders.get_order(int_id)
+                message_dict = {message: 'Present location changed', 'order': order_d}
+            else:
+                return {message: response}, 403 
             
         else: 
             message_dict = {message: 'No parcel order with that id'}

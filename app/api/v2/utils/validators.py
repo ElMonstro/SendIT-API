@@ -92,6 +92,13 @@ class Validator:
 
         return response
 
+    def status_validator(self, status):
+        if status == 'Delivered':
+                return 'Unsuccesful, order already delivered'
+        if status == 'Canceled':
+            return 'Unsuccessful, order is canceled'
+        return True
+
             
 
 
