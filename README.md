@@ -14,9 +14,18 @@ The sendIT app is built using flask to make RESTful APIs to achieve basic functi
 | `POST`        | `/api/v1/parcels`                     |   Create a new parcel order                   |
 | `GET`         | `/api/v1/parcels`                     |   Get a all parcel delivery orders            |
 | `GET`         | `/api/v1/parcels/<parcel-id>`         |   Get a single delivery order by id           |
-| `POST`        | `/api/v1/login`                      |   log a user into account                     |
+| `POST`        | `/api/v1/login`                       |   log a user into account                     |
 | `PUT`         | `/api/v1/parcels/<parcel-id>/cancel`  |   Cancel a specific parcel delivery order     |
 | `PUT`         | `/api/v1/parcels/<parcel-d>`          |   Change specific delivery order to delivered |
+| ------------- |       -------------                   |         -------------                         |
+| `POST`        | `/api/v2/parcels`                     |   Create a new parcel order                   |
+| `GET`         | `/api/v2/parcels`                     |   Get a all parcel delivery orders            |
+| `GET`         | `/api/v2/parcels/<parcel-id>`         |   Get a single delivery order by id           |
+| `POST`        | `/api/v2/auth/login`                  |   log a user into account                     |
+| `PUT`         | `/api/v2/parcels/<parcel-id>/cancel`  |   Cancel a specific parcel delivery order     |
+| `PUT`         | `/api/v2/parcels/<parcel-d>/status`   |   Change specific delivery order to delivered |
+| `POST`        | `/api/v2/auth/signup`                 |   A user can signup                           |
+
 
 # Development Environment
 **Note: This instructions are for ubuntu operating distro but are compatible with debian based linux distros**
@@ -39,6 +48,10 @@ if not install it with:
 ```
 sudo apt install git
 ```
+- Install postgres if not present with:
+```
+sudo apt-get install postgresql postgresql-contrib
+```
 - Install postman by downloading it from here:
 https://www.getpostman.com/
 
@@ -56,7 +69,12 @@ activate the environment before cloning the project from github
 ```
 source venv/bin/activate
 ```
+## Setip database
 
+- Create a database 
+- Export its url to environment variable:
+```
+export DB_URL='postgresql://username:password@server:port/db_name'
 ## Clone and Configure a the sendIT flask Project
 
 Provided you have a github account, login before entering the command to create a local copy of the repo

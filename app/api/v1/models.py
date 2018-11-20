@@ -108,9 +108,6 @@ class Users:
 class Validator:
     """Validates incoming data"""
 
-    def __init__(self):
-        self.users = users
-
     def order_list_validator(self, order):
         """Check validity of parcels POST data"""
         keys = ['pickup', 'dest', 'recepient_name', 'recepient_no', 'weight']
@@ -125,7 +122,11 @@ class Validator:
         if not len(str(order['recepient_no'])) == 9:
             return {message: 'Phone number must have ten digits'}
         if not len(str(order['pickup'])) == 8 and not len(str(order['dest'])) == 8:
-            return {message: 'Addresses should be eight digits'}        
+            return {message: 'Addresses should be eight digits'}
+        if len(order['recepient_name']) < 3:
+            return {message: 'Receipient name too short'}
+        if not order['recepient_name'].isalpha():
+            return {message: 'Receipient name must be in letters'}        
         return True
 
     
