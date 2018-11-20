@@ -15,7 +15,7 @@ class ParcelsTestCase(unittest.TestCase):
         self.app = create_app(config='test')
         self.client = self.app.test_client(self)
         self.app.testing = True
-        self.db_conn = DbConnect()
+        self.db_conn = DbConnect('test') 
         self.order = mock_data['order']
         data = json.dumps(mock_data['admin'])
         response = self.client.post(
@@ -27,7 +27,7 @@ class ParcelsTestCase(unittest.TestCase):
         self.user_token_dict = json.loads(response.data)
        
         self.client.post('api/v2/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
-        
+         
 
 class GoodRequestTestCase(ParcelsTestCase):
     """This class tests views with valid requests"""
