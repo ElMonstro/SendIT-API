@@ -96,12 +96,8 @@ class Register(Resource):
 
         user_dict = {'username': username, 'password': password, 'email': email}
         user_id = self.users.add_user(user_dict)
-        if not user_id:
-            return {message: 'Username or email already used'}
-
-        exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-        payload = { 'user_id':user_id, 'exp': exp}
-        token = jwt.encode(payload, key=secret, ) 
+        user_dict['user_id'] = user_id
         return {
             message: 'User registered',
-            'token': token.decode('utf-8')}
+            'user': user_dict
+            }
