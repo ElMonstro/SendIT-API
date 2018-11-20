@@ -210,7 +210,7 @@ class ChangeDestLocation(Resource):
         except KeyError:
             return {message: 'dest_location key not in object'}
         except TypeError:
-            return {message: 'Current Location must be an object'}
+            return {message: 'Destination Location must be an object'}
 
         str(dest_loc)
 
