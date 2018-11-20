@@ -114,16 +114,16 @@ class Orders(DataBase):
 
     def change_current_loc(self, user_id, order_id, curr_loc,):
         """Updates current parcel location"""
-        query = """UPDATE SET current_location='{}' where order_id = {};""".format(curr_loc, order_id)
-        query1 = """INSERT INTO notification (user_id, order_id, message) VALUES ({}, {}, 'Current location updated');""".format(user_id, order_id)
+        query = """UPDATE orders SET current_location = '{}' where order_id = {};""".format(curr_loc, order_id)
+        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Current location updated');""".format(user_id, order_id)
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()
 
     def change_dest_loc(self, user_id, order_id, dest_loc):
         """Updates parcel destination location"""
-        query = """UPDATE SET current_location='{}' where order_id = {};""".format(dest_loc, order_id)
-        query1 = """INSERT INTO notification (user_id, order_id, message) VALUES ({}, {}, 'Current location updated');""".format(user_id, order_id)
+        query = """UPDATE orders SET current_location='{}' where order_id = {};""".format(dest_loc, order_id)
+        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Current location updated');""".format(user_id, order_id)
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()

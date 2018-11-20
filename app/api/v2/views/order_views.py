@@ -82,7 +82,7 @@ class CancelOrder(Resource):
 
     @authenticate
     def put(self, id, user_data):
-        """Handles PUTrcels/<parcel_id>/cancel"""
+        """Handles PUT parcels/<parcel_id>/cancel"""
         message_dict = {}
         status_code = 200
         if user_data['is_admin']:
@@ -140,4 +140,50 @@ class DeliverOrder(Resource):
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
         return message_dict, status_code            
+
+
+class ChangeCurrentLocation(Resource):
+    """Handles the route parcels/<parcel-id>/PresentLocation"""
+    def __init__(self):
+        self.orders = Orders()
+
+    @authenticate
+    def put(self, id, user_data):
+        """Handle request put requests to  parcels/<parcel-id>/PresentLocation"""
+        message_dict = {}
+        status_code = 200
+        if not user_data['is_admin']:
+            return { message: 'Cannot perform this operation' }, 401
+        try:
+            int_id = int(id)
+        except ValueError:
+            return {message: 'Wrong id format'}, 400
+        
+        data = request.get_json()
+        try:
+            curr_loc = data['curr_location']
+        except KeyError:
+            return {message: 'curr_location key not in object'}
+        except TypeError:
+            {message: 'Current Location must be an object'}
+
+        status = self.orders.get_order_status(int_id)
+
+        if status:
+            if status == 'Delivered':
+                return {message: 'Unsuccesful, order already delivered'}, 403
+            if status == 'Canceled':
+                return {message: 'Unsuccessful, order is canceled'}, 403
+            self.orders.change_current_loc(user_data['user_id'], int_id, curr_loc)
+            return {message: 'Present Location changed'}
+            
+        else: 
+            message_dict = {message: 'No parcel order with that id'}
+            status_code = 400
+        return message_dict, status_code
+
+
+        
+        
+        
 
