@@ -186,6 +186,50 @@ class ChangeCurrentLocation(Resource):
         return message_dict, status_code
 
 
+class ChangeDestLocation(Resource):
+    """Handles the route parcels/<parcel-id>/PresentLocation"""
+    def __init__(self):
+        self.orders = Orders()
+        self.validators = Validator()
+
+    @authenticate
+    def put(self, id, user_data):
+        """Handle request put requests to  parcels/<parcel-id>/PresentLocation"""
+        message_dict = {}
+        status_code = 200
+        if user_data['is_admin']:
+            return { message: 'Cannot perform this operation' }, 401
+        try:
+            int_id = int(id)
+        except ValueError:
+            return {message: 'Wrong id format'}, 400
+        
+        data = request.get_json()
+        try:
+            dest_loc = data['dest_location']
+        except KeyError:
+            return {message: 'dest_location key not in object'}
+        except TypeError:
+            return {message: 'Current Location must be an object'}
+
+        str(dest_loc)
+
+        status = self.orders.get_order_status(int_id)
+
+        if status:
+            response = self.validators.status_validator(status)
+            if response == True:
+                self.orders.change_dest_loc(user_data['user_id'],int_id, dest_loc)
+                order_d = self.orders.get_order(int_id)
+                message_dict = {message: 'Destination location changed', 'order': order_d}
+            else:
+                return {message: response}, 403 
+            
+        else: 
+            message_dict = {message: 'No parcel order with that id'}
+            status_code = 400
+        return message_dict, status_code
+
         
         
         
