@@ -87,6 +87,16 @@ class ValidatorsTestCase(unittest.TestCase):
         resp = validator(mock_data['space_usnm'], 'josh@gmail.com', mock_data['user_dets'])
         self.assertEqual(resp, "Username cannot have spaces")
 
+    def test_status_validator(self):
+        """Test if status is delivered"""
+        validator = self.validator.status_validator
+        response = validator('Delivered')
+        self.assertEqual(response, 'Unsuccesful, order already delivered')
+        response = validator('Canceled')
+        self.assertEqual(response, 'Unsuccessful, order is canceled')
+        response = validator('In-transit')
+        self.assertTrue(response)
+
 
         
 

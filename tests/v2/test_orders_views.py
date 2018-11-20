@@ -91,7 +91,19 @@ class GoodRequestTestCase(ParcelsTestCase):
             'api/v2/parcels/{}'.format(last_rec), headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('order' in data) 
+        self.assertTrue('order' in data)
+
+    def test_change_curr_location(self):
+        """Tests PUT /parcels/<id>/PresentLocation"""
+        # Test with  with valid data
+        self.client.post('api/v2/parcels/', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
+        last_rec = self.db_conn.get_last_record_id()
+        data = json.dumps({"curr_location": "Nairobi"})
+        response = self.client.put(
+            'api/v2/parcels/{}/PresentLocation'.format(last_rec),data=data, headers=self.admin_token_dict, content_type="application/json")
+        self.assertEqual(json.loads(response.data)['message'], 'Present location changed')
+        self.assertTrue('order' in json.loads(response.data))
+        self.assertEqual(response.status_code, 200)
 
     def tearDown(self):
         """Clear database records"""
