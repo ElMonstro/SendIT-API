@@ -8,7 +8,7 @@ class Config:
 class DevConfig(Config):
     """Development"""
     DEBUG = True
-    DB_URL = 'postgresql://elmonstro:password@localhost:5432/sendit'
+    DB_URL = os.getenv('DB_URL')
 
 class DeploymentConfig(Config):
     """Deployment Config"""
@@ -18,7 +18,7 @@ class DeploymentConfig(Config):
 class TestConfig(Config):
     """Testing config"""
     DEBUG = True
-    DB_URL = 'postgresql://elmonstro:password@localhost:5432/test_db'
+    DB_URL = os.getenv('TEST_DB_URL')
 
 config_dict = {
     'dev': DevConfig,
