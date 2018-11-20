@@ -11,7 +11,6 @@ class ValidatorsTestCase(unittest.TestCase):
     def setUp(self):
         """Set up test variables"""
         self.validator = Validator()
-        self.users = Users()
 
     def test_order_post_data_validator(self):
         """Tests order_list_validator"""

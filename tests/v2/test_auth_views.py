@@ -42,7 +42,7 @@ class TestRegister(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(data['message'], 'User registered')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('token' in data)
+        self.assertTrue('user' in data)
 
     def tearDown(self):
         """Delete user records"""

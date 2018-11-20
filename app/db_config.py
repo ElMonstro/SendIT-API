@@ -1,17 +1,22 @@
 import os
 import psycopg2
-from flask import current_app as app
 
 
 class DbConnect:
-    def __init__(self):
-        self.DB_URL = os.getenv('DB_URL')
+    def __init__(self, config='dev'):
+        if config == 'test':
+            self.DB_URL = os.getenv('TEST_DB_URL')
+        if config == 'dev':
+            self.DB_URL = os.getenv('DB_URL')
+        self.config = config
         self.conn = get_connection(self.DB_URL)
         self.cursor = self.conn.cursor()
 
-    def create_tables(self, url):
+    def create_tables(self):
         """Create tabes"""
         queries = create_queries()
+        if self.config == 'dev':
+            queries.pop()
         try:
             for query in queries:
                 self.cursor.execute(query)
@@ -108,4 +113,4 @@ def create_queries():
     return [user_table, order_table, notifications, create_admin, create_user]
 
 if __name__ == '__main__':
-    print(DbConnect().delete_latest_user())
+    print(DbConnect('test').delete_latest_user())
