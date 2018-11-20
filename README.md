@@ -69,7 +69,7 @@ activate the environment before cloning the project from github
 ```
 source venv/bin/activate
 ```
-## Setip database
+## Setup database
 
 - Create a database 
 - Export its url to environment variable:
