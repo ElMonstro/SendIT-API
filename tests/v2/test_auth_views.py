@@ -34,7 +34,7 @@ class TestRegister(ParcelsTestCase):
 
     def test_register(self):
         """Tests good requests to POST auth/register"""
-        # Register write data
+        # Register good data
         data = mock_data['register']
         data = json.dumps(data)
         response = self.client.post(
@@ -112,7 +112,54 @@ class AuthBadRequestTestCase(ParcelsTestCase):
 
     def test_register(self):
         """Test bad request to route /auth/signup"""
-        pass
+         # Test no username
+        data = {'password': 'pwd', 'email': 'Josh'}
+        data = json.dumps(data)
+        response = self.client.post(
+            'api/v2/auth/signup', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Username not provided'})
+        self.assertEqual(response.status_code, 400)
+        # Test no password
+        data = {'username': 'admin', 'email': 'a@g.com' }
+        data = json.dumps(data)
+        response = self.client.post(
+            'api/v2/auth/signup', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Password not provided'})
+        self.assertEqual(response.status_code, 400)
+        # Test no email
+        data = {'username': 'admin', 'password': 'a@g.com' }
+        data = json.dumps(data)
+        response = self.client.post(
+            'api/v2/auth/signup', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Email not provided'})
+        self.assertEqual(response.status_code, 400)
+        # Test with wrong format of auth/login credentials
+        data = ['Bad', 'data', 'format']
+        data = json.dumps(data)
+        response = self.client.post(
+            'api/v2/auth/signup', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data, {message: 'Invalid data format'})
+        self.assertEqual(response.status_code, 400)
+        # Register bad email
+        data = mock_data['bad_email_r']
+        data = json.dumps(data)
+        response = self.client.post(
+            'api/v2/auth/signup', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Email invalid')
+        self.assertEqual(response.status_code, 400)
+        # Test bad usernsmr
+        data = mock_data['bad_usern_r']
+        data = json.dumps(data)
+        response = self.client.post(
+            'api/v2/auth/signup', content_type="application/json", data=data)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], "Username cannot be less than four characters")
+        self.assertEqual(response.status_code, 400)
 
     def test_create_parcel_authentication(self):
         """Tests POST requests to api/v2/parcels with no token, invalid token or unauthorized user"""
@@ -158,7 +205,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
             'api/v2/parcels/100/deliver', headers={'token': 'jonjffriu8u483u8384u82'})
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid token'})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 401)    
 
     def test_cancel_order_authentication(self):
         """Tests PUT requests to api/v2/parcels/<parcel-id>/cancel with no token, invalid token or unauthorized user"""

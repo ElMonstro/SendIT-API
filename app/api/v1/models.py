@@ -35,7 +35,6 @@ class ParcelOrders:
             if order_id == order['order_id']:
                 order['status'] = canceled
                 return order
-        return False
 
     def get_all_orders(self):
         """Returns all orders"""
