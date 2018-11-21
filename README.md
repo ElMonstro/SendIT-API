@@ -78,6 +78,7 @@ source venv/bin/activate
 ```
 export DB_URL='postgresql://username:password@server:port/db_name'
 ## Clone and Configure a the sendIT flask Project
+```
 
 Provided you have a github account, login before entering the command to create a local copy of the repo
 
