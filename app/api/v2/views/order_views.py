@@ -212,7 +212,7 @@ class ChangeDestLocation(Resource):
         except TypeError:
             return {message: 'Destination Location must be an object'}, 400
 
-        str(dest_loc)
+    
 
         status = self.orders.get_order_status(int_id)
 
