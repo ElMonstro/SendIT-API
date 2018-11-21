@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/ElMonstro/SendIT-API.svg?branch=ft-admin-get-all-orders-161700246)](https://travis-ci.org/ElMonstro/SendIT-API)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/7afda6c46de2f7995949/test_coverage)](https://codeclimate.com/github/ElMonstro/SendIT-API/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/7afda6c46de2f7995949/maintainability)](https://codeclimate.com/github/ElMonstro/SendIT-API/maintainability)
-de)
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 
