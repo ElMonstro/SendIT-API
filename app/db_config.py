@@ -7,7 +7,7 @@ class DbConnect:
         if config == 'test':
             self.DB_URL = os.getenv('TEST_DB_URL')
         if config == 'dev':
-            self.DB_URL = os.getenv('DB_URL')
+            self.DB_URL = 'postgres://gjmfftiqogkmro:094234a259032a6aa229e5b2680d98f5c582ade219feac97b263f360010dc709@ec2-54-204-36-249.compute-1.amazonaws.com:5432/d1csuju2i60r9m'
         self.config = config
         self.conn = get_connection(self.DB_URL)
         self.cursor = self.conn.cursor()
