@@ -83,26 +83,13 @@ class Orders(DataBase):
             return orders_list
         return False
 
-    def is_order_there(self, order_id):
-        """Check if order is there"""
-        is_there = True
-        query = """SELECT  user_id FROM orders WHERE order_id = {};""".format(order_id)
-        self.cursor.execute(query)
-        result = self.cursor.fetchone()
-        if not result:
-            is_there = False
-        return is_there
-
-
-
     def cancel_order(self, order_id, user_id):
         """Updates status column to cancelled"""
         query = """UPDATE orders SET status = 'Canceled' WHERE order_id = {};""".format(order_id)
         query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Order canceled');""".format(user_id, order_id)
         self.cursor.execute(query)
         self.cursor.execute(query1)
-        self.conn.commit()
-        
+        self.conn.commit()        
 
     def deliver_order(self, user_id, order_id):
         """Updates status column to delivered"""

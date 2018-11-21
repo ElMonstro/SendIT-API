@@ -56,10 +56,30 @@ bad_name = {
  "dest": 1234678 
 }
 
+num_name = { 
+ "weight": 3,
+ "recepient_name": "M4532",
+ "recepient_no": 726404622,
+ "pickup": 13456708,
+ "dest": 1234678 
+}
+
 
 user_register = {
     'username': 'Eminem',
     'email': 'emm@gmail.com',
+    'password': 'P@ssw1rds'
+}
+
+bad_usern_register = {
+    'username': 'nem',
+    'email': 'emm@gmail.com',
+    'password': 'Psw1rds'
+}
+
+bad_email_user_register = {
+    'username': 'Eminem',
+    'email': 'emmgmail.com',
     'password': 'P@ssw1rds'
 }
 
@@ -80,10 +100,6 @@ space_usernm = 'dfa affa'
 # mock emails
 reg_email = 'jratcher@gmail.com'
 bad_email = 'j.com'
-
-
-
-
 
 
 # Login credentials
@@ -120,4 +136,7 @@ mock_data = {
     'register': user_register,
     'bad_pass': bad_passwords,
     'good_pass': good_password,
+    'num_name': num_name,
+    'bad_email_r': bad_email_user_register,
+    'bad_usern_r': bad_usern_register
 }

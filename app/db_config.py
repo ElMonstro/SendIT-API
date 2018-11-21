@@ -24,12 +24,6 @@ class DbConnect:
             pass
         self.conn.commit()
     
-    def drop_tables(self):
-        """Delete tables"""
-        query = """DROP TABLE IF EXISTS users, orders, notifications CASCADE; """
-        self.cursor.execute(query)
-        self.conn.commit()
-
     def get_last_record_id(self):
         """Retuns the last record id"""
         query = """SELECT order_id FROM orders order by order_id desc limit 1;"""
@@ -50,22 +44,12 @@ class DbConnect:
         query = """DELETE FROM users WHERE user_id = {};""".format(user_id)
         self.cursor.execute(query)
         self.conn.commit()
-
-
-
-
     
 
 def get_connection(url):
     """Creates and return connection"""
     conn = psycopg2.connect(url)
     return conn
-
-def init_dbase(url):
-    """Start database"""
-    psycopg2.connect(url)
-
-
 
 def create_queries():
     """Return queries"""

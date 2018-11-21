@@ -165,9 +165,9 @@ class ChangeCurrentLocation(Resource):
         try:
             curr_loc = data['curr_location']
         except KeyError:
-            return {message: 'curr_location key not in object'}
+            return {message: 'curr_location key not in object'}, 400
         except TypeError:
-            return {message: 'Current Location must be an object'}
+            return {message: 'Current Location must be an object'}, 400
 
         status = self.orders.get_order_status(int_id)
 
@@ -208,9 +208,9 @@ class ChangeDestLocation(Resource):
         try:
             dest_loc = data['dest_location']
         except KeyError:
-            return {message: 'dest_location key not in object'}
+            return {message: 'dest_location key not in object'}, 400
         except TypeError:
-            return {message: 'Destination Location must be an object'}
+            return {message: 'Destination Location must be an object'}, 400
 
         str(dest_loc)
 

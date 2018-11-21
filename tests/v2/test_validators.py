@@ -34,6 +34,8 @@ class ValidatorsTestCase(unittest.TestCase):
         self.assertEqual(res_message, {message: 'Wrong data type on one or more details'})
         res_message = order_list_validator(mock_data['bad_name'])
         self.assertEqual(res_message, {message: 'Receipient name too short'})
+        res_message = order_list_validator(mock_data['num_name'])
+        self.assertEqual(res_message, {message: 'Receipient name must be in letters'})
         # Add test
 
     def test_password_validator(self):
@@ -66,25 +68,26 @@ class ValidatorsTestCase(unittest.TestCase):
         self.assertTrue(resp)
         # Test with bad data
         # Registered username
-        validator = self.validator.username_email_validator
         resp = validator(mock_data['reg_usernm'], 'moracha@gmail.com', mock_data['user_dets'])
         self.assertEqual(resp, "Username already taken")
         # Registered email
-        validator = self.validator.username_email_validator
         resp = validator('moracha', mock_data['reg_email'], mock_data['user_dets'])
         self.assertEqual(resp, "Email already used to register")
         # invalid email
-        validator = self.validator.username_email_validator
         resp = validator('moracha', mock_data['bad_email'], mock_data['user_dets'])
         self.assertEqual(resp, "Email invalid")
         # username less than four characters
-        validator = self.validator.username_email_validator
         resp = validator('moa', 'josh@gmail.com', mock_data['user_dets'])
         self.assertEqual(resp, "Username cannot be less than four characters")
         # username with characters
-        validator = self.validator.username_email_validator
         resp = validator(mock_data['space_usnm'], 'josh@gmail.com', mock_data['user_dets'])
         self.assertEqual(resp, "Username cannot have spaces")
+        # username starting with number
+        resp = validator('5mvdfg', 'josh@gmail.com', mock_data['user_dets'])
+        self.assertEqual(resp, "Username must start with a letter")
+        # Username with wrong characters
+        resp = validator('gtftas%$', 'josh@gmail.com', mock_data['user_dets'])
+        self.assertEqual(resp, "Username cannot have this characters: @*#%!&$")
 
     def test_status_validator(self):
         """Test if status is delivered"""
