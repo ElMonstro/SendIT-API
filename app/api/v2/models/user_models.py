@@ -74,8 +74,7 @@ class Users(DataBase):
         query = """SELECT  password FROM users WHERE username = '{}';""".format(username)
         self.cursor.execute(query)
         pwd = self.cursor.fetchone()        
-        return password == pwd[0]
-        
+        return password == pwd[0]        
         
 
     def get_user_id(self, username):
@@ -85,12 +84,6 @@ class Users(DataBase):
         result = self.cursor.fetchone()
         return result
 
-    def create_admin(self):
-        """Creates admin"""    
-        query = """INSERT INTO users (username, password, email, is_admin)
-                VALUES ('admin', 'password', 'jratcher@gmail.com', True);"""
-        self.cursor.execute(query)
-        self.conn.commit()
 
     def is_admin(self, user_id):
         """check if user is an admin"""
