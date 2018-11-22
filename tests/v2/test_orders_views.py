@@ -13,7 +13,7 @@ class ParcelsTestCase(unittest.TestCase):
     def setUp(self):
         """Sets up test variables"""
         self.app = create_app(config='test')
-        self.client = self.app.test_client(self)
+        self.client = self.app.test_client()
         self.app.testing = True
         self.db_conn = DbConnect('test') 
         self.order = mock_data['order']
@@ -30,8 +30,7 @@ class ParcelsTestCase(unittest.TestCase):
          
 
 class GoodRequestTestCase(ParcelsTestCase):
-    """This class tests views with valid requests"""
-   
+    """This class tests views with valid requests"""  
 
     def test_create_order(self):
         """Tests good requests to POST /parcels"""
@@ -143,7 +142,7 @@ class BadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/35420/cancel', headers=self.user_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
         self.assertEqual(
             data, {'message': 'No Parcel delivery order with that id'})
         # Test invalid format id
@@ -160,7 +159,7 @@ class BadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/35420/deliver', headers=self.admin_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
         self.assertEqual(
             data, {'message': 'No Parcel delivery order with that id'})
         # Test invalid format id
@@ -192,8 +191,8 @@ class BadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/{}/PresentLocation'.format(last_rec), headers=self.user_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'Cannot perform this operation'})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data, {message: 'You are not authorized to perform this operation'})
+        self.assertEqual(response.status_code, 403)
         # Test invalid format id
         response = self.client.put(
             'api/v2/parcels/35uh420/PresentLocation', headers=self.admin_token_dict)  # Incorrect id format
@@ -204,7 +203,7 @@ class BadRequestTestCase(ParcelsTestCase):
         data = json.dumps("dest_location")
         response = self.client.put(
             'api/v2/parcels/{}/PresentLocation'.format(last_rec),data=data, headers=self.admin_token_dict, content_type="application/json")
-        self.assertEqual(json.loads(response.data)['message'], 'Current Location must be an object')
+        self.assertEqual(json.loads(response.data)['message'], 'Current Location must be in an object')
         self.assertEqual(response.status_code, 400)
         # Test with no curr_loc key
         data = json.dumps({"dest_location": 'fdtg'})
@@ -219,12 +218,12 @@ class BadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/{}/PresentLocation'.format(last_rec),data=data, headers=self.admin_token_dict, content_type="application/json")
         self.assertEqual(json.loads(response.data)['message'], 'Unsuccesful, order already delivered')
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
         # Test with bogus parcel id
         response = self.client.put(
             'api/v2/parcels/2342214/PresentLocation' ,data=data, headers=self.admin_token_dict, content_type="application/json")
         self.assertEqual(json.loads(response.data)['message'], 'No parcel order with that id')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
     
     def test_change_dest_location(self):
         """Tests PUT requests to api/v2/parcels/<id>/destination """
@@ -234,8 +233,8 @@ class BadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/{}/destination'.format(last_rec), headers=self.admin_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'Cannot perform this operation'})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data, {message: 'You are not authorized to perform this operation'})
+        self.assertEqual(response.status_code, 403)
         # Test invalid format id
         response = self.client.put(
             'api/v2/parcels/35uh420/destination', headers=self.user_token_dict)  # Incorrect id format
@@ -246,7 +245,7 @@ class BadRequestTestCase(ParcelsTestCase):
         data = json.dumps("dest_location")
         response = self.client.put(
             'api/v2/parcels/{}/destination'.format(last_rec),data=data, headers=self.user_token_dict, content_type="application/json")
-        self.assertEqual(json.loads(response.data)['message'], 'Destination Location must be an object')
+        self.assertEqual(json.loads(response.data)['message'], 'Destination Location must be in an object')
         self.assertEqual(response.status_code, 400)
         # Test with no dest_location key
         data = json.dumps({"c_location": 'fdtg'})
@@ -261,21 +260,21 @@ class BadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/{}/destination'.format(last_rec),data=data, headers=self.user_token_dict, content_type="application/json")
         self.assertEqual(json.loads(response.data)['message'], 'Unsuccesful, order already delivered')
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
         # Test with bogus parcel id
         response = self.client.put(
             'api/v2/parcels/2342214/destination' ,data=data, headers=self.user_token_dict, content_type="application/json")
         self.assertEqual(json.loads(response.data)['message'], 'No parcel order with that id')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
     def test_get_all_orders_by_user(self):
         """Tests bad requests to GET /users/<id>/parcels"""
         # Test with accessing other users parcels
         response = self.client.get(
             'api/v2/users/35530/parcels', headers=self.user_token_dict)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(json.loads(response.data), {
-                         'message': 'Cannot perform this operation'})
+                         'message': 'You are not authorized to perform this operation'})
         # Test with wrong format user id
         response = self.client.get(
             'api/v2/users/35fsv530/parcels', headers=self.user_token_dict)
@@ -287,7 +286,7 @@ class BadRequestTestCase(ParcelsTestCase):
             'api/v2/users/104/parcels', headers=self.admin_token_dict)
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'No orders by that user'})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
     def test_get_specific_order(self):
         """Tests bad requests to GET /parcels/<id>"""
@@ -298,7 +297,7 @@ class BadRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(
             data, {'message': 'No Parcel delivery order with that id'})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
         # Test with wrong parcel id format
         response = self.client.get(
             'api/v2/parcels/24034u', headers=self.user_token_dict)  # Incorrect id format

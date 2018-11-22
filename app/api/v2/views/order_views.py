@@ -69,7 +69,7 @@ class Parcel(Resource):
             message_dict = {message: 'One order fetched', 'order': order}
         else: 
             message_dict = {message: 'No Parcel delivery order with that id'}
-            status_code = 400
+            status_code = 404
         return message_dict, status_code
         
     
@@ -139,7 +139,7 @@ class DeliverOrder(Resource):
                 return {message: response}, 403 
         else:       
             message_dict = {message: 'No Parcel delivery order with that id'}
-            status_code = 400
+            status_code = 404
         return message_dict, status_code            
 
 
@@ -182,7 +182,7 @@ class ChangeCurrentLocation(Resource):
             
         else: 
             message_dict = {message: 'No parcel order with that id'}
-            status_code = 400
+            status_code = 404
         return message_dict, status_code
 
 

@@ -173,8 +173,8 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.post('/api/v2/parcels',
                                     data=data, content_type='application/json', headers=self.admin_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {'message': 'Cannot perform this operation'})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data, {'message': 'You are not authorized to perform this operation'})
+        self.assertEqual(response.status_code, 403)
         # Test with expired token
         data = json.dumps(self.order)
         response = self.client.post('/api/v2/parcels',
@@ -189,8 +189,8 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.get(
             'api/v2/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'Cannot perform this operation'})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data, {message: 'You are not authorized to perform this operation'})
+        self.assertEqual(response.status_code, 403)
 
     def test_deliver_authentication(self):
         """Tests PUT requests to api/v2/parcels/<id> with no token, invalid token or unauthorized user"""
@@ -198,8 +198,8 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/100/deliver', headers=self.user_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'Cannot perform this operation'})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data, {message: 'You are not authorized to perform this operation'})
+        self.assertEqual(response.status_code, 403)
         # Test with invalid token
         response = self.client.put(
             'api/v2/parcels/100/deliver', headers={'token': 'jonjffriu8u483u8384u82'})
@@ -213,7 +213,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/100/cancel', headers=self.admin_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'Cannot perform this operation'})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data, {message: 'You are not authorized to perform this operation'})
+        self.assertEqual(response.status_code, 403)
 
 
