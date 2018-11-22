@@ -6,7 +6,7 @@ message = 'message'
 
 
 class Orders(DataBase):
-    """Handles order tables operations"""
+    """Handles order tables operations""" 
 
     def add_order(self, order, user_id):
         """Saves order to database"""
