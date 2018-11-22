@@ -25,7 +25,7 @@ class ValidatorsTestCase(unittest.TestCase):
         res_message = order_list_validator(mock_data['bad_key'])
         self.assertEqual(res_message, {message: 'One or more of object keys is invalid'})
         res_message = order_list_validator(mock_data['invalid_addr'])
-        self.assertEqual(res_message, {message: 'Addresses should be eight digits'}  )
+        self.assertEqual(res_message, {message: 'Town or city names must be more than three letters'}  )
         res_message = order_list_validator(mock_data['less'])
         self.assertEqual(res_message, {message: 'Invalid number of order details'} )
         res_message = order_list_validator(mock_data['invalid_tel'])
