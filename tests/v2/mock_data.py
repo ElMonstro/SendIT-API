@@ -1,67 +1,67 @@
 # Tests Mock data
 
 
-order = { 
- "weight": 3,
- "recepient_name": "Moracha",
- "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": 1234678 
+order = {
+    "weight": 3,
+    "recepient_name": "Moracha",
+    "recepient_no": 726404622,
+    "pickup": 'Kisii',
+    "dest": 'Nairobi'
 }
 
-bad_key = { 
- "weight": 3,
- "reepient_name": "Moracha",
- "recepient_no": 726404622,
- "pikup": 13456708,
- "dest": 1234678 
+bad_key = {
+    "weight": 3,
+    "reepient_name": "Moracha",
+    "recepient_no": 726404622,
+    "pikup": 'Kisii',
+    "dest": 'Nairobi'
 }
 
-less_keys = { 
- "recepient_name": "Moracha",
- "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": 1234678 
+less_keys = {
+    "recepient_name": "Moracha",
+    "recepient_no": 726404622,
+    "pickup": 'Kisii',
+    "dest": 'Nairobi'
 }
 
-invalid_data = { 
- "weight": '3',
- "recepient_name": "Moracha",
- "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": '1234678' 
+invalid_data = {
+    "weight": '3',
+    "recepient_name": "Moracha",
+    "recepient_no": 726404622,
+    "pickup": 'Kisii',
+    "dest": 'Nairobi'
 }
 
-invalid_tel = { 
- "weight": 3,
- "recepient_name": "Moracha",
- "recepient_no": 72644622,
- "pickup": 13456708,
- "dest": 1234678 
+invalid_tel = {
+    "weight": 3,
+    "recepient_name": "Moracha",
+    "recepient_no": 72644622,
+    "pickup": 'Kisii',
+    "dest": 'Nairobi'
 }
 
-invalid_addr = { 
- "weight": 3,
- "recepient_name": "Moracha",
- "recepient_no": 726404622,
- "pickup": 1356708,
- "dest": 1234678 
+invalid_addr = {
+    "weight": 3,
+    "recepient_name": "Moracha",
+    "recepient_no": 726404622,
+    "pickup": '',
+    "dest": ''
 }
 
-bad_name = { 
- "weight": 3,
- "recepient_name": "Ma",
- "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": 1234678 
+bad_name = {
+    "weight": 3,
+    "recepient_name": "Ma",
+    "recepient_no": 726404622,
+    "pickup": 'Kisii',
+    "dest": 'Nairobi'
 }
 
-num_name = { 
- "weight": 3,
- "recepient_name": "M4532",
- "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": 1234678 
+num_name = {
+    "weight": 3,
+    "recepient_name": "M4532",
+    "recepient_no": 726404622,
+    "pickup": 'Kisii',
+    "dest": 'Nairobi'
 }
 
 
@@ -83,7 +83,8 @@ bad_email_user_register = {
     'password': 'P@ssw1rds'
 }
 
-bad_passwords = ['fssa', 'VEVEVFA$E', '@sfsfsfvs', 'fngGfeHs', 'Good5stuff', 'Jratcher$ f34']
+bad_passwords = ['fssa', 'VEVEVFA$E', '@sfsfsfvs',
+                 'fngGfeHs', 'Good5stuff', 'Jratcher$ f34']
 good_password = 'Josh!elmon5tr0'
 
 user_details = {
@@ -104,15 +105,14 @@ bad_email = 'j.com'
 
 # Login credentials
 admin_login = {'username': 'admin',
-                    'password': 'password'}
+               'password': 'password'}
 
 user_login = {'username': 'dan',
-                    'password': 'password'}
+              'password': 'password'}
 
 message = 'message'
 
-expired_token =  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtYWlsIjoiYWJieUBnbWFpbC5jb20iLCJpc19hZG1pbiI6ZmFsc2UsImV4cCI6MTU0MTc0MTE0MX0.uckKmwZ3YqQU4M36xhbEcXLx4KQ4B4Ej-Vua4Yw0HCM"
-
+expired_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIGlkIjoxMDMsImVtYWlsIjoiYWJieUBnbWFpbC5jb20iLCJpc19hZG1pbiI6ZmFsc2UsImV4cCI6MTU0MTc0MTE0MX0.uckKmwZ3YqQU4M36xhbEcXLx4KQ4B4Ej-Vua4Yw0HCM"
 
 
 mock_data = {

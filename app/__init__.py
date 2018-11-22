@@ -12,5 +12,5 @@ def create_app(config='dev'):
     db_conn = DbConnect(config)
     db_conn.create_tables()
     app.register_blueprint(v1)
-    app.register_blueprint(v2) 
+    app.register_blueprint(v2)
     return app
