@@ -119,7 +119,7 @@ class Orders(DataBase):
 
     def change_dest_loc(self, user_id, order_id, dest_loc):
         """Updates parcel destination location"""
-        query = """UPDATE orders SET current_location='{}' where order_id = {};""".format(
+        query = """UPDATE orders SET dest='{}' where order_id = {};""".format(
             dest_loc, order_id)
         query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Current location updated');""".format(
             user_id, order_id)
