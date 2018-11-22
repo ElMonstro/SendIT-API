@@ -5,63 +5,63 @@ order = {
  "weight": 3,
  "recepient_name": "Moracha",
  "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": 1234678 
+ "pickup": 'Kisii',
+ "dest": 'Nairobi' 
 }
 
 bad_key = { 
  "weight": 3,
  "reepient_name": "Moracha",
  "recepient_no": 726404622,
- "pikup": 13456708,
- "dest": 1234678 
+ "pikup": 'Kisii',
+ "dest": 'Nairobi' 
 }
 
 less_keys = { 
  "recepient_name": "Moracha",
  "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": 1234678 
+ "pickup": 'Kisii',
+ "dest": 'Nairobi' 
 }
 
 invalid_data = { 
  "weight": '3',
  "recepient_name": "Moracha",
  "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": '1234678' 
+ "pickup": 'Kisii',
+ "dest": 'Nairobi' 
 }
 
 invalid_tel = { 
  "weight": 3,
  "recepient_name": "Moracha",
  "recepient_no": 72644622,
- "pickup": 13456708,
- "dest": 1234678 
+ "pickup": 'Kisii',
+ "dest": 'Nairobi' 
 }
 
 invalid_addr = { 
  "weight": 3,
  "recepient_name": "Moracha",
  "recepient_no": 726404622,
- "pickup": 1356708,
- "dest": 1234678 
+ "pickup": '',
+ "dest": '' 
 }
 
 bad_name = { 
  "weight": 3,
  "recepient_name": "Ma",
  "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": 1234678 
+ "pickup": 'Kisii',
+ "dest": 'Nairobi' 
 }
 
 num_name = { 
  "weight": 3,
  "recepient_name": "M4532",
  "recepient_no": 726404622,
- "pickup": 13456708,
- "dest": 1234678 
+ "pickup": 'Kisii',
+ "dest": 'Nairobi' 
 }
 
 
