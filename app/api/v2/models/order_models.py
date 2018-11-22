@@ -17,10 +17,12 @@ class Orders(DataBase):
         order['user_id'] = user_id
 
         query = """INSERT INTO orders (user_id, recepient_name, recepient_no, weight, pickup, current_location, dest)
-                VALUES ({user_id}, '{recepient_name}', '{recepient_no}',{weight}, '{pickup}', '{pickup}', '{dest}');""".format(**order)
+                VALUES ({user_id}, '{recepient_name}', '{recepient_no}',{weight}, '{pickup}', '{pickup}', '{dest}') RETURNING order_id;""".format(**order)
 
         self.cursor.execute(query)
+        order_id = self.cursor.fetchone()[0]
         self.conn.commit()
+        order['order_id'] = order_id
         return order
 
     def get_order(self, order_id):
