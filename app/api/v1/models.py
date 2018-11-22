@@ -9,14 +9,16 @@ message = 'message'
 orders = []
 counter = count(start=100)
 
+
 class ParcelOrders:
     """Orders Model"""
+
     def __init__(self):
         """Initialize parcel orders"""
         self.validator = Validator()
 
     def save(self, order, user_id):
-        """Save data from POST request"""           
+        """Save data from POST request"""
         message = self.validator.order_list_validator(order)
 
         if message == True:
@@ -46,7 +48,6 @@ class ParcelOrders:
             if order_id == order['order_id']:
                 return order
         return False
-
 
     def get_all_user_orders(self, user_id):  # add tests
         """Returns all orders by specified user"""
@@ -100,9 +101,6 @@ class Users:
             if user['user_id'] == user_id:
                 return user['password'] == pswd
 
-    
-
-
 
 class Validator:
     """Validates incoming data"""
@@ -125,7 +123,5 @@ class Validator:
         if len(order['recepient_name']) < 3:
             return {message: 'Receipient name too short'}
         if not order['recepient_name'].isalpha():
-            return {message: 'Receipient name must be in letters'}        
+            return {message: 'Receipient name must be in letters'}
         return True
-
-    

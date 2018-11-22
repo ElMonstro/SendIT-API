@@ -7,6 +7,7 @@ from .test_orders_views import ParcelsTestCase
 from app.api.v2.utils.validators import Validator
 from app.db_config import DbConnect
 
+
 class AuthGoodRequestTestCase(ParcelsTestCase):
     """Tests requests with valid authenticaton"""
 
@@ -29,6 +30,7 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
 
+
 class TestRegister(ParcelsTestCase):
     """Test valid request to /auth/sighnup"""
 
@@ -47,10 +49,6 @@ class TestRegister(ParcelsTestCase):
     def tearDown(self):
         """Delete user records"""
         self.db_conn.delete_latest_user()
-
-    
-
-    
 
 
 class AuthBadRequestTestCase(ParcelsTestCase):
@@ -112,7 +110,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
 
     def test_register(self):
         """Test bad request to route /auth/signup"""
-         # Test no username
+        # Test no username
         data = {'password': 'pwd', 'email': 'Josh'}
         data = json.dumps(data)
         response = self.client.post(
@@ -121,7 +119,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         self.assertEqual(data, {message: 'Username not provided'})
         self.assertEqual(response.status_code, 400)
         # Test no password
-        data = {'username': 'admin', 'email': 'a@g.com' }
+        data = {'username': 'admin', 'email': 'a@g.com'}
         data = json.dumps(data)
         response = self.client.post(
             'api/v2/auth/signup', content_type="application/json", data=data)
@@ -129,7 +127,7 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         self.assertEqual(data, {message: 'Password not provided'})
         self.assertEqual(response.status_code, 400)
         # Test no email
-        data = {'username': 'admin', 'password': 'a@g.com' }
+        data = {'username': 'admin', 'password': 'a@g.com'}
         data = json.dumps(data)
         response = self.client.post(
             'api/v2/auth/signup', content_type="application/json", data=data)
@@ -158,13 +156,15 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.post(
             'api/v2/auth/signup', content_type="application/json", data=data)
         data = json.loads(response.data)
-        self.assertEqual(data['message'], "Username cannot be less than four characters")
+        self.assertEqual(
+            data['message'], "Username cannot be less than four characters")
         self.assertEqual(response.status_code, 400)
 
     def test_create_parcel_authentication(self):
         """Tests POST requests to api/v2/parcels with no token, invalid token or unauthorized user"""
         # Test no token in headers
-        response = self.client.post('api/v2/parcels', data=json.dumps(mock_data['order']))
+        response = self.client.post(
+            'api/v2/parcels', data=json.dumps(mock_data['order']))
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Token missing'})
         self.assertEqual(response.status_code, 401)
@@ -173,7 +173,8 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.post('/api/v2/parcels',
                                     data=data, content_type='application/json', headers=self.admin_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {'message': 'You are not authorized to perform this operation'})
+        self.assertEqual(
+            data, {'message': 'You are not authorized to perform this operation'})
         self.assertEqual(response.status_code, 403)
         # Test with expired token
         data = json.dumps(self.order)
@@ -189,7 +190,8 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.get(
             'api/v2/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'You are not authorized to perform this operation'})
+        self.assertEqual(
+            data, {message: 'You are not authorized to perform this operation'})
         self.assertEqual(response.status_code, 403)
 
     def test_deliver_authentication(self):
@@ -198,14 +200,15 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/100/deliver', headers=self.user_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'You are not authorized to perform this operation'})
+        self.assertEqual(
+            data, {message: 'You are not authorized to perform this operation'})
         self.assertEqual(response.status_code, 403)
         # Test with invalid token
         response = self.client.put(
             'api/v2/parcels/100/deliver', headers={'token': 'jonjffriu8u483u8384u82'})
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Invalid token'})
-        self.assertEqual(response.status_code, 401)    
+        self.assertEqual(response.status_code, 401)
 
     def test_cancel_order_authentication(self):
         """Tests PUT requests to api/v2/parcels/<parcel-id>/cancel with no token, invalid token or unauthorized user"""
@@ -213,7 +216,6 @@ class AuthBadRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/100/cancel', headers=self.admin_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {message: 'You are not authorized to perform this operation'})
+        self.assertEqual(
+            data, {message: 'You are not authorized to perform this operation'})
         self.assertEqual(response.status_code, 403)
-
-

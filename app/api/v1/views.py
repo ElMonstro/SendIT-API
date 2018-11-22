@@ -21,7 +21,7 @@ class Parcels(Resource):
         """Handles get requests to /parcels route"""
         if self.users.is_admin(user_id):
             return {message: 'All orders fetched',
-                'orders': self.orders.get_all_orders()}, 200
+                    'orders': self.orders.get_all_orders()}, 200
         else:
             return {message: 'Cannot perform this operation'}, 401
 
@@ -39,7 +39,7 @@ class Parcels(Resource):
 
         if not message in order:
             message_dict = {message: 'Order created',
-            'order': order}
+                            'order': order}
             status_code = 201
         else:
             message_dict = order
@@ -68,8 +68,8 @@ class Parcel(Resource):
         order = self.orders.get_specific_order(int_id)
 
         if order:
-          return {message: 'One order fetched', 'order': order}
-    
+            return {message: 'One order fetched', 'order': order}
+
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
@@ -91,7 +91,7 @@ class Parcel(Resource):
 
         if order:
             message_dict = {message: 'Status changed',
-            'order': order}
+                            'order': order}
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 400
@@ -139,7 +139,7 @@ class CancelOrder(Resource):
         """Handles put requests to /parcels<id>/cancel route"""
         message_dict = {}
         status_code = 200
-       
+
         try:
             int_id = int(id)
         except ValueError:

@@ -22,8 +22,10 @@ class ParcelsTestCase(unittest.TestCase):
         response = self.client.post(
             'api/v1/login', content_type="application/json", data=data)
         self.user_token_dict = json.loads(response.data)
-        self.client.post('api/v1/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
-        self.client.post('api/v1/parcels', data=json.dumps(self.order), headers=self.user_token_dict, content_type="application/json")
+        self.client.post('api/v1/parcels', data=json.dumps(self.order),
+                         headers=self.user_token_dict, content_type="application/json")
+        self.client.post('api/v1/parcels', data=json.dumps(self.order),
+                         headers=self.user_token_dict, content_type="application/json")
 
 
 class GoodRequestTestCase(ParcelsTestCase):
@@ -44,17 +46,20 @@ class GoodRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v1/parcels/100', headers=self.admin_token_dict)
         self.assertTrue('order' in json.loads(response.data))
-        self.assertEqual(json.loads(response.data)['message'], 'Status changed')
+        self.assertEqual(json.loads(response.data)[
+                         'message'], 'Status changed')
         self.assertEqual(response.status_code, 200)
 
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
         # Test with the right auth token
-        self.client.post('api/v1/parcels', data=json.dumps(mock_data['order']), headers=self.user_token_dict)
+        self.client.post(
+            'api/v1/parcels', data=json.dumps(mock_data['order']), headers=self.user_token_dict)
         response = self.client.put(
             'api/v1/parcels/100/cancel', headers=self.user_token_dict)
         self.assertTrue('order' in json.loads(response.data))
-        self.assertEqual(json.loads(response.data)['message'], 'Order canceled')
+        self.assertEqual(json.loads(response.data)[
+                         'message'], 'Order canceled')
         self.assertEqual(response.status_code, 200)
 
     def test_get_all_orders(self):
@@ -82,7 +87,7 @@ class GoodRequestTestCase(ParcelsTestCase):
             'api/v1/parcels/100', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('order' in data) 
+        self.assertTrue('order' in data)
 
 
 class BadRequestTestCase(ParcelsTestCase):
@@ -95,8 +100,9 @@ class BadRequestTestCase(ParcelsTestCase):
                                     data=json.dumps(['jay', 'bad', 'data']), content_type='application/json', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(data, {'message': 'Payload must be a dictionary(object)'})
-       
+        self.assertEqual(
+            data, {'message': 'Payload must be a dictionary(object)'})
+
     def test_cancel_order(self):
         """Tests PUT /parcels/<id>/cancel"""
         # Test unregistered id
@@ -257,7 +263,8 @@ class AuthBadRequestTestCase(ParcelsTestCase):
     def test_create_parcel_authentication(self):
         """Tests POST requests to api/v1/parcels with no token, invalid token or unauthorized user"""
         # Test no token in headers
-        response = self.client.post('api/v1/parcels', data=json.dumps(mock_data['order']))
+        response = self.client.post(
+            'api/v1/parcels', data=json.dumps(mock_data['order']))
         data = json.loads(response.data)
         self.assertEqual(data, {message: 'Token missing'})
         self.assertEqual(response.status_code, 401)
@@ -322,26 +329,32 @@ class ValidatorsTestCase(unittest.TestCase):
         """Tests order_list_validator"""
         order_list_validator = self.validator.order_list_validator
         good_data = mock_data['order']
-       
+
         # Test with good data
         valid = order_list_validator(good_data)
         self.assertEqual(valid, True)
         message = 'message'
         # Test with bad data
         res_message = order_list_validator(mock_data['bad_key'])
-        self.assertEqual(res_message, {message: 'One or more of object keys is invalid'})
+        self.assertEqual(
+            res_message, {message: 'One or more of object keys is invalid'})
         res_message = order_list_validator(mock_data['invalid_addr'])
-        self.assertEqual(res_message, {message: 'Addresses should be eight digits'}  )
+        self.assertEqual(
+            res_message, {message: 'Addresses should be eight digits'})
         res_message = order_list_validator(mock_data['less'])
-        self.assertEqual(res_message, {message: 'Invalid number of order details'} )
+        self.assertEqual(
+            res_message, {message: 'Invalid number of order details'})
         res_message = order_list_validator(mock_data['invalid_tel'])
-        self.assertEqual(res_message, {message: 'Phone number must have ten digits'} )
+        self.assertEqual(
+            res_message, {message: 'Phone number must have ten digits'})
         res_message = order_list_validator(mock_data['invalid_data'])
-        self.assertEqual(res_message, {message: 'Wrong data type on one or more details'})
+        self.assertEqual(
+            res_message, {message: 'Wrong data type on one or more details'})
         res_message = order_list_validator(mock_data['bad_name'])
         self.assertEqual(res_message, {message: 'Receipient name too short'})
         res_message = order_list_validator(mock_data['num_name'])
-        self.assertEqual(res_message, {message: 'Receipient name must be in letters'})
+        self.assertEqual(
+            res_message, {message: 'Receipient name must be in letters'})
 
     def test_user_checker(self):
         """Test user checker"""
