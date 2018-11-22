@@ -1,4 +1,5 @@
 import os
+from werkzeug.security import check_password_hash
 from app.db_config import get_connection
 import psycopg2
 from flask import current_app as app 
@@ -57,9 +58,8 @@ class Users(DataBase):
         """Check if credentials are right"""
         query = """SELECT  password FROM users WHERE username = '{}';""".format(username)
         self.cursor.execute(query)
-        pwd = self.cursor.fetchone()        
-        return password == pwd[0]    
-        
+        pwd = self.cursor.fetchone()[0]        
+        return check_password_hash(pwd, password)        
 
     def get_user_id(self, username):
         """Check if user is there"""

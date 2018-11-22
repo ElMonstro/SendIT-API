@@ -1,3 +1,4 @@
+from werkzeug.security import generate_password_hash
 from validate_email import validate_email
 from flask import request
 from flask_restful  import Resource
@@ -93,10 +94,11 @@ class Register(Resource):
         if is_valid != True: 
             return {message: is_valid}, 400
        
-
+        password = generate_password_hash(password)
         user_dict = {'username': username, 'password': password, 'email': email}
         user_id = self.users.add_user(user_dict)
         user_dict['user_id'] = user_id
+        del user_dict['password']
         return {
             message: 'User registered',
             'user': user_dict

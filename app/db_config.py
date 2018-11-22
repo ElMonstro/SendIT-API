@@ -1,5 +1,6 @@
 import os
 import psycopg2
+from werkzeug.security import generate_password_hash
 
 
 class DbConnect:
@@ -57,7 +58,7 @@ def create_queries():
         CREATE TABLE IF NOT EXISTS users(
         user_id SERIAL PRIMARY KEY,
         username VARCHAR (100) UNIQUE NOT NULL,
-        password VARCHAR (50) NOT NULL,
+        password VARCHAR (100) NOT NULL,
         email VARCHAR (355) UNIQUE NOT NULL,
         is_admin BOOL DEFAULT FALSE,
         created_on TIMESTAMP DEFAULT NOW(),
@@ -87,14 +88,13 @@ def create_queries():
         is_seen BOOL DEFAULT FALSE,
         created_on TIMESTAMP DEFAULT NOW()
         );"""
-
+    
+    password = generate_password_hash('password')
     create_admin ="""INSERT INTO users (username, password, email, is_admin)
-                VALUES ('admin', 'password', 'jratcher@gmail.com', True);"""
+                VALUES ('admin', '{}', 'jratcher@gmail.com', True);""".format(password)
     
     create_user ="""INSERT INTO users (username, password, email, is_admin)
-                VALUES ('dan', 'password', 'dan@gmail.com', False);"""
+                VALUES ('dan', '{}', 'dan@gmail.com', False);""".format(password)
 
     return [user_table, order_table, notifications, create_admin, create_user]
 
-if __name__ == '__main__':
-    print(DbConnect('test').delete_latest_user())
