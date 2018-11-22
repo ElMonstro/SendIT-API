@@ -52,7 +52,7 @@ class Login(Resource):
                 exp = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
                 payload = {'user_id': user_id[0], 'exp': exp}
                 token = jwt.encode(payload, key=secret, )
-                return {
+                return { message: 'Login successful',
                     'token': token.decode('utf-8',)}
             # If password not valid
             message_dict = {message: 'Invalid password'}
