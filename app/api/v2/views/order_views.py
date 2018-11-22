@@ -24,7 +24,7 @@ class Parcels(Resource):
             orders = self.orders.get_all_orders()
             return {message: "All orders fetched", 'orders': orders}
         else: 
-            return { message: 'Cannot perform this operation' }, 401
+            return { message: 'You are not authorized to perform this operation' }, 403
 
     @authenticate
     def post(self, user_data):
@@ -33,7 +33,7 @@ class Parcels(Resource):
         status_code = 200
 
         if user_data['is_admin']: 
-            return {message: 'Cannot perform this operation'}, 401
+            return {message: 'You are not authorized to perform this operation'}, 403
 
         data = request.get_json()
         order = self.orders.add_order(data, user_data['user_id'])
@@ -86,7 +86,7 @@ class CancelOrder(Resource):
         message_dict = {}
         status_code = 200
         if user_data['is_admin']:
-            return { message: 'Cannot perform this operation' }, 401
+            return { message: 'You are not authorized to perform this operation' }, 403
         try:
             int_id = int(id)
         except ValueError:
@@ -96,15 +96,15 @@ class CancelOrder(Resource):
             
         if status:
             if status == 'Delivered':
-                return {message: 'Unsuccesful, order already delivered'}, 403
+                return {message: 'Unsuccesful, order already delivered'}, 400
             if status == 'Canceled':
-                return {message: 'Unsuccessful, order is canceled'}, 403 
+                return {message: 'Unsuccessful, order is canceled'}, 400
             self.orders.cancel_order(int_id, user_data['user_id'])
             order_d = self.orders.get_order(int_id)
             message_dict = {message: 'Order canceled', 'order': order_d} 
         else:       
             message_dict = {message: 'No Parcel delivery order with that id'}
-            status_code = 400
+            status_code = 404
         return message_dict, status_code
 
 
@@ -121,7 +121,7 @@ class DeliverOrder(Resource):
         message_dict = {}
         status_code = 200
         if not user_data['is_admin']:
-            return { message: 'Cannot perform this operation' }, 401
+            return { message: 'You are not authorized to perform this operation' }, 403
         try:
             int_id = int(id)
         except ValueError:
@@ -155,7 +155,7 @@ class ChangeCurrentLocation(Resource):
         message_dict = {}
         status_code = 200
         if not user_data['is_admin']:
-            return { message: 'Cannot perform this operation' }, 401
+            return { message: 'You are not authorized to perform this operation' }, 403
         try:
             int_id = int(id)
         except ValueError:
@@ -167,7 +167,7 @@ class ChangeCurrentLocation(Resource):
         except KeyError:
             return {message: 'curr_location key not in object'}, 400
         except TypeError:
-            return {message: 'Current Location must be an object'}, 400
+            return {message: 'Current Location must be in an object'}, 400
 
         status = self.orders.get_order_status(int_id)
 
@@ -178,7 +178,7 @@ class ChangeCurrentLocation(Resource):
                 order_d = self.orders.get_order(int_id)
                 message_dict = {message: 'Present location changed', 'order': order_d}
             else:
-                return {message: response}, 403 
+                return {message: response}, 400 
             
         else: 
             message_dict = {message: 'No parcel order with that id'}
@@ -198,7 +198,7 @@ class ChangeDestLocation(Resource):
         message_dict = {}
         status_code = 200
         if user_data['is_admin']:
-            return { message: 'Cannot perform this operation' }, 401
+            return { message: 'You are not authorized to perform this operation' }, 403
         try:
             int_id = int(id)
         except ValueError:
@@ -210,7 +210,7 @@ class ChangeDestLocation(Resource):
         except KeyError:
             return {message: 'dest_location key not in object'}, 400
         except TypeError:
-            return {message: 'Destination Location must be an object'}, 400
+            return {message: 'Destination Location must be in an object'}, 400
 
     
 
@@ -223,11 +223,11 @@ class ChangeDestLocation(Resource):
                 order_d = self.orders.get_order(int_id)
                 message_dict = {message: 'Destination location changed', 'order': order_d}
             else:
-                return {message: response}, 403 
+                return {message: response}, 400
             
         else: 
             message_dict = {message: 'No parcel order with that id'}
-            status_code = 400
+            status_code = 404
         return message_dict, status_code
 
         
