@@ -20,11 +20,11 @@ class ParcelsTestCase(unittest.TestCase):
         data = json.dumps(mock_data['admin'])
         response = self.client.post(
             'api/v2/auth/login', content_type="application/json", data=data)
-        self.admin_token_dict = json.loads(response.data)
+        self.admin_token_dict = {'token': json.loads(response.data)['token']}
         data = json.dumps(mock_data['user'])
         response = self.client.post(
             'api/v2/auth/login', content_type="application/json", data=data)
-        self.user_token_dict = json.loads(response.data)
+        self.user_token_dict = {'token': json.loads(response.data)['token']}
 
         self.client.post('api/v2/parcels', data=json.dumps(self.order),
                          headers=self.user_token_dict, content_type="application/json")

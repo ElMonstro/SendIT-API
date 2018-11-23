@@ -23,26 +23,18 @@ class ValidatorsTestCase(unittest.TestCase):
         self.assertEqual(valid, True)
         message = 'message'
         # Test with bad data
-        res_message = order_list_validator(mock_data['bad_key'])
+        res_message = order_list_validator(mock_data['bad_keys'])
         self.assertEqual(
-            res_message, {message: 'One or more of object keys is invalid'})
-        res_message = order_list_validator(mock_data['invalid_addr'])
+            res_message, mock_data['badkeys_r'])
+        res_message = order_list_validator(mock_data['invalid_data'])
         self.assertEqual(
-            res_message, {message: 'Town or city names must be more than three letters'})
+            res_message, mock_data['invalid_data_r'])
         res_message = order_list_validator(mock_data['less'])
         self.assertEqual(
             res_message, {message: 'Invalid number of order details'})
-        res_message = order_list_validator(mock_data['invalid_tel'])
+        res_message = order_list_validator(mock_data['bad_data_type'])
         self.assertEqual(
-            res_message, {message: 'Phone number must have ten digits'})
-        res_message = order_list_validator(mock_data['invalid_data'])
-        self.assertEqual(
-            res_message, {message: 'Wrong data type on one or more details'})
-        res_message = order_list_validator(mock_data['bad_name'])
-        self.assertEqual(res_message, {message: 'Receipient name too short'})
-        res_message = order_list_validator(mock_data['num_name'])
-        self.assertEqual(
-            res_message, {message: 'Receipient name must be in letters'})
+            res_message, mock_data['bad_data_type_r'])
         # Add test
 
     def test_password_validator(self):
