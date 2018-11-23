@@ -29,7 +29,7 @@ class AuthGoodRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in data)
-
+        self.assertEqual(data['message'], 'Login successful')
 
 class TestRegister(ParcelsTestCase):
     """Test valid request to /auth/sighnup"""
