@@ -6,7 +6,7 @@ message = 'message'
 
 
 class Orders(DataBase):
-    """Handles order tables operations""" 
+    """Handles order tables operations"""
 
     def add_order(self, order, user_id):
         """Saves order to database"""
@@ -87,22 +87,22 @@ class Orders(DataBase):
             return orders_list
         return False
 
-    def cancel_order(self, order_id, user_id):
-        """Updates status column to cancelled"""
-        query = """UPDATE orders SET status = 'Canceled' WHERE order_id = {};""".format(
-            order_id)
-        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Order canceled');""".format(
-            user_id, order_id)
-        self.cursor.execute(query)
-        self.cursor.execute(query1)
-        self.conn.commit()
-
-    def deliver_order(self, user_id, order_id):
+    def change_order_status(self, user_id=None, order_id=None, status=None):
         """Updates status column to delivered"""
-        query = """UPDATE orders SET status = 'Delivered' WHERE order_id = {};""".format(
-            order_id)
-        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Parcel delivered');""".format(
-            user_id, order_id)
+
+        if status == "Rejected":
+            notification_message = "Parcel delivery order rejected"
+        elif status == "In-transit":
+            notification_message = "Parcel delivery order accepted"
+        elif status == "Delivered":
+            notification_message = "Parcel delivery order delivered"
+        elif status == "Canceled":
+            notification_message = "Parcel delivery order canceled"
+
+        query = """UPDATE orders SET status = '{}' WHERE order_id = {};""".format(status,
+                                                                                  order_id)
+        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, '{}');""".format(
+            user_id, order_id, notification_message)
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()
@@ -126,15 +126,3 @@ class Orders(DataBase):
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()
-
-    def get_order_status(self, order_id):
-        """Gets the order status"""
-        query = """SELECT status FROM orders WHERE order_id = {};""".format(
-            order_id)
-        self.cursor.execute(query)
-        status = self.cursor.fetchone()
-        if status:
-            status = status[0]
-        return status
-
-   # Orders().add_order({'user_id': 23, 'recepient_name': ''  })
