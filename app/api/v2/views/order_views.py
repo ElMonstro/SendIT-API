@@ -179,10 +179,10 @@ class ChangeCurrentLocation(Resource):
         except TypeError:
             return {message: 'Current Location must be in an object'}, 400
 
-        order = self.orders.get_order(int_id)
-        status = order['status']
+        order = self.orders.get_order(int_id)        
 
-        if status:
+        if order:
+            status = order['status']
             response = self.validators.status_validator(status)
             if response == True:
                 self.orders.change_location(
@@ -227,9 +227,9 @@ class ChangeDestLocation(Resource):
             return {message: 'Destination Location must be in an object'}, 400
 
         order = self.orders.get_order(int_id)
-        status = order['status']
 
-        if status:
+        if order:
+            status = order['status']
             response = self.validators.status_validator(status)
             if response == True:
                 self.orders.change_location(
