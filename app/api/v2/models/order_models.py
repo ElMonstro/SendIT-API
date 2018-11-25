@@ -107,22 +107,18 @@ class Orders(DataBase):
         self.cursor.execute(query1)
         self.conn.commit()
 
-    def change_current_loc(self, user_id, order_id, curr_loc,):
+    def change_location(self, user_id=None, order_id=None, column=None, location=None):
+        if column == "current_location":
+            notification_message = "Current location of your parcel has been changed to {}".format(
+                location)
+        elif column == "dest":
+            notification_message = "Destination location of your parcel has been changed to {}".format(
+                location)
         """Updates current parcel location"""
-        query = """UPDATE orders SET current_location = '{}' where order_id = {};""".format(
-            curr_loc, order_id)
-        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Current location updated');""".format(
-            user_id, order_id)
-        self.cursor.execute(query)
-        self.cursor.execute(query1)
-        self.conn.commit()
-
-    def change_dest_loc(self, user_id, order_id, dest_loc):
-        """Updates parcel destination location"""
-        query = """UPDATE orders SET dest='{}' where order_id = {};""".format(
-            dest_loc, order_id)
-        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, 'Current location updated');""".format(
-            user_id, order_id)
+        query = """UPDATE orders SET {} = '{}' where order_id = {};""".format(column,
+                                                                              location, order_id)
+        query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, '{}');""".format(
+            user_id, order_id, notification_message)
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()
