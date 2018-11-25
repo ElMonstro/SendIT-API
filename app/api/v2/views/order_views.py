@@ -81,6 +81,7 @@ class CancelOrder(Resource):
 
     def __init__(self):
         self.orders = Orders()
+        self.validators = Validator()
 
     @authenticate
     def put(self, id, user_data):
@@ -100,13 +101,13 @@ class CancelOrder(Resource):
             if not order['user_id'] == user_data['user_id']:
                 return {message: 'You are not authorized to perform this operation'}, 403
             status = order['status']
-            if status == 'Delivered':
-                return {message: 'Unsuccesful, order already delivered'}, 400
-            if status == 'Canceled':
-                return {message: 'Unsuccessful, order is canceled'}, 400
-            self.orders.change_order_status(user_id=user_data['user_id'], order_id=int_id,status=canceled)
-            order_d = self.orders.get_order(int_id)
-            message_dict = {message: 'Order canceled', 'order': order_d}
+            error_message = self.validators.status_validator(status)
+            if error_message == True:
+                self.orders.change_order_status(user_id=user_data['user_id'], order_id=int_id,status=canceled)
+                order_d = self.orders.get_order(int_id)
+                message_dict = {message: 'Order canceled', 'order': order_d}
+            else:
+                return {message: error_message}, 400
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 404
@@ -142,7 +143,7 @@ class DeliverOrder(Resource):
                 order_d = self.orders.get_order(int_id)
                 message_dict = {message: 'Status changed', 'order': order_d}
             else:
-                return {message: error_message}, 403
+                return {message: error_message}, 400
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 404
@@ -176,7 +177,8 @@ class ChangeCurrentLocation(Resource):
         except TypeError:
             return {message: 'Current Location must be in an object'}, 400
 
-        status = self.orders.get_order_status(int_id)
+        order = self.orders.get_order(int_id)
+        status = order['status']
 
         if status:
             response = self.validators.status_validator(status)
@@ -222,7 +224,8 @@ class ChangeDestLocation(Resource):
         except TypeError:
             return {message: 'Destination Location must be in an object'}, 400
 
-        status = self.orders.get_order_status(int_id)
+        order = self.orders.get_order(int_id)
+        status = order['status']
 
         if status:
             response = self.validators.status_validator(status)
