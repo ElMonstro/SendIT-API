@@ -87,7 +87,7 @@ def create_queries():
         notification_id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users,
         order_id INTEGER REFERENCES orders ON DELETE SET NULL,
-        message VARCHAR (50) NOT NULL,
+        message VARCHAR (100) NOT NULL,
         is_seen BOOL DEFAULT FALSE,
         created_on TIMESTAMP DEFAULT NOW()
         );"""
@@ -100,3 +100,4 @@ def create_queries():
                 VALUES ('dan', '{}', 'dan@gmail.com', False);""".format(password)
 
     return [user_table, order_table, notifications, create_admin, create_user]
+
