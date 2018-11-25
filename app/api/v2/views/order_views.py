@@ -105,7 +105,8 @@ class CancelOrder(Resource):
             status = order['status']
             error_message = self.validators.status_validator(status)
             if error_message == True:
-                self.orders.change_order_status(user_id=user_data['user_id'], order_id=int_id,status=canceled)
+                self.orders.change_order_status(
+                    user_id=user_data['user_id'], order_id=int_id, status=canceled)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {message: 'Order canceled', 'order': order_d}
             else:
@@ -141,7 +142,8 @@ class DeliverOrder(Resource):
             status = order['status']
             error_message = self.validators.status_validator(status)
             if error_message == True:
-                self.orders.change_order_status(user_id=user_data['user_id'], order_id=int_id,status=delivered)
+                self.orders.change_order_status(
+                    order_id=int_id, status=delivered)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {message: 'Order delivered', 'order': order_d}
             else:
@@ -179,14 +181,14 @@ class ChangeCurrentLocation(Resource):
         except TypeError:
             return {message: 'Current Location must be in an object'}, 400
 
-        order = self.orders.get_order(int_id)        
+        order = self.orders.get_order(int_id)
 
         if order:
             status = order['status']
             response = self.validators.status_validator(status)
             if response == True:
                 self.orders.change_location(
-                    user_id=user_data['user_id'], order_id=int_id, location=curr_loc, column=current_location)
+                    order_id=int_id, location=curr_loc, column=current_location)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {
                     message: 'Present location changed', 'order': order_d}
@@ -233,7 +235,7 @@ class ChangeDestLocation(Resource):
             response = self.validators.status_validator(status)
             if response == True:
                 self.orders.change_location(
-                    user_id=user_data['user_id'], order_id=int_id, location=dest_loc, column=dest)
+                    order_id=int_id, location=dest_loc, column=dest)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {
                     message: 'Destination location changed', 'order': order_d}

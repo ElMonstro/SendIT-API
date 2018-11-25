@@ -87,9 +87,9 @@ class Orders(DataBase):
             return orders_list
         return False
 
-    def change_order_status(self, user_id=None, order_id=None, status=None):
+    def change_order_status(self, order_id=None, status=None):
         """Updates status column to delivered"""
-
+        user_id = self.get_order(order_id)['user_id']
         if status == "Rejected":
             notification_message = "Parcel delivery order rejected"
         elif status == "In-transit":
@@ -98,22 +98,28 @@ class Orders(DataBase):
             notification_message = "Parcel delivery order delivered"
         elif status == "Canceled":
             notification_message = "Parcel delivery order canceled"
+            user_id = 1
 
         query = """UPDATE orders SET status = '{}' WHERE order_id = {};""".format(status,
                                                                                   order_id)
+        
         query1 = """INSERT INTO notifications (user_id, order_id, message) VALUES ({}, {}, '{}');""".format(
             user_id, order_id, notification_message)
         self.cursor.execute(query)
         self.cursor.execute(query1)
         self.conn.commit()
 
-    def change_location(self, user_id=None, order_id=None, column=None, location=None):
+    def change_location(self, order_id=None, column=None, location=None):
+        """Changes order locations"""
+        user_id = self.get_order(order_id)['user_id']
         if column == "current_location":
             notification_message = "Current location of your parcel has been changed to {}".format(
                 location)
         elif column == "dest":
             notification_message = "Destination location of your parcel has been changed to {}".format(
                 location)
+            user_id = 1
+            
         """Updates current parcel location"""
         query = """UPDATE orders SET {} = '{}' where order_id = {};""".format(column,
                                                                               location, order_id)
