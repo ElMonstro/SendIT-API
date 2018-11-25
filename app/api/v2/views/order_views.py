@@ -13,6 +13,8 @@ canceled = "Canceled"
 rejected = "Rejected"
 delivered = "Delivered"
 in_transit = "In-transit"
+current_location = "current_location"
+dest = "dest"
 
 
 class Parcels(Resource):
@@ -141,7 +143,7 @@ class DeliverOrder(Resource):
             if error_message == True:
                 self.orders.change_order_status(user_id=user_data['user_id'], order_id=int_id,status=delivered)
                 order_d = self.orders.get_order(int_id)
-                message_dict = {message: 'Status changed', 'order': order_d}
+                message_dict = {message: 'Order delivered', 'order': order_d}
             else:
                 return {message: error_message}, 400
         else:
@@ -183,8 +185,8 @@ class ChangeCurrentLocation(Resource):
         if status:
             response = self.validators.status_validator(status)
             if response == True:
-                self.orders.change_current_loc(
-                    user_data['user_id'], int_id, curr_loc)
+                self.orders.change_location(
+                    user_id=user_data['user_id'], order_id=int_id, location=curr_loc, column=current_location)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {
                     message: 'Present location changed', 'order': order_d}
@@ -230,8 +232,8 @@ class ChangeDestLocation(Resource):
         if status:
             response = self.validators.status_validator(status)
             if response == True:
-                self.orders.change_dest_loc(
-                    user_data['user_id'], int_id, dest_loc)
+                self.orders.change_location(
+                    user_id=user_data['user_id'], order_id=int_id, location=dest_loc, column=dest)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {
                     message: 'Destination location changed', 'order': order_d}
