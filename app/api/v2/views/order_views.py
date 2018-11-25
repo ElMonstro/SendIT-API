@@ -9,6 +9,10 @@ from app.api.v2.utils.auth_decorator import authenticate
 from app.api.v2.utils.validators import Validator
 
 message = 'message'
+canceled = "Canceled"
+rejected = "Rejected"
+delivered = "Delivered"
+in_transit = "In-transit"
 
 
 class Parcels(Resource):
@@ -90,14 +94,17 @@ class CancelOrder(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        status = self.orders.get_order_status(int_id)
+        order = self.orders.get_order(int_id)
 
-        if status:
+        if order:
+            if not order['user_id'] == user_data['user_id']:
+                return {message: 'You are not authorized to perform this operation'}, 403
+            status = order['status']
             if status == 'Delivered':
                 return {message: 'Unsuccesful, order already delivered'}, 400
             if status == 'Canceled':
                 return {message: 'Unsuccessful, order is canceled'}, 400
-            self.orders.cancel_order(int_id, user_data['user_id'])
+            self.orders.change_order_status(user_id=user_data['user_id'], order_id=int_id,status=canceled)
             order_d = self.orders.get_order(int_id)
             message_dict = {message: 'Order canceled', 'order': order_d}
         else:
@@ -125,16 +132,17 @@ class DeliverOrder(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        status = self.orders.get_order_status(int_id)
+        order = self.orders.get_order(int_id)
 
-        if status:
-            response = self.validators.status_validator(status)
-            if response == True:
-                self.orders.deliver_order(user_data['user_id'], int_id)
+        if order:
+            status = order['status']
+            error_message = self.validators.status_validator(status)
+            if error_message == True:
+                self.orders.change_order_status(user_id=user_data['user_id'], order_id=int_id,status=delivered)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {message: 'Status changed', 'order': order_d}
             else:
-                return {message: response}, 403
+                return {message: error_message}, 403
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 404
