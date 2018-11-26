@@ -111,11 +111,11 @@ class Users(DataBase):
 
     def get_notification(self, notification_id):
         """Gets one notification"""
-        query = """SELECT notification_id, order_id, message, created_on FROM notifications WHERE notification_id = {};""".format(
+        query = """SELECT notification_id, user_id, order_id, message, created_on FROM notifications WHERE notification_id = {};""".format(
             notification_id)
         cursor = self.conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute(query)
-        notification = cursor.fetchall()
+        notification = cursor.fetchone()
         if notification:
             notification['created_on'] = notification['created_on'].strftime("%Y-%m-%d %H:%M:%S") 
         return notification
