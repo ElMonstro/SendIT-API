@@ -106,7 +106,7 @@ class CancelOrder(Resource):
             error_message = self.validators.status_validator(status)
             if error_message == True:
                 self.orders.change_order_status(
-                    user_id=user_data['user_id'], order_id=int_id, status=canceled)
+                    order_id=int_id, status=canceled)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {message: 'Order canceled', 'order': order_d}
             else:
