@@ -51,7 +51,7 @@ class GoodRequestTestCase(ParcelsTestCase):
         response = self.client.put(
             'api/v2/parcels/{}/deliver'.format(last_rec), headers=self.admin_token_dict)
         self.assertEqual(json.loads(response.data)[
-                         'message'], 'Status changed')
+                         'message'], 'Order delivered')
         self.assertTrue('order' in json.loads(response.data))
         self.assertEqual(response.status_code, 200)
 
@@ -186,7 +186,7 @@ class BadRequestTestCase(ParcelsTestCase):
             'api/v2/parcels/{}/deliver'.format(last_rec), headers=self.admin_token_dict)
         self.assertEqual(json.loads(response.data)[
                          'message'], 'Unsuccesful, order already delivered')
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
 
     # def test_get_all_orders(self):
       #  """Tests bad requests to GET /parcels"""
