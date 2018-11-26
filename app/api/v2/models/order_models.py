@@ -91,14 +91,15 @@ class Orders(DataBase):
         """Updates status column to delivered"""
         user_id = self.get_order(order_id)['user_id']
         if status == "Rejected":
-            notification_message = "Parcel delivery order rejected"
-        elif status == "In-transit":
-            notification_message = "Parcel delivery order accepted"
+            notification_message = "Parcel delivery order {} rejected"
+        elif status == "In-transit": 
+            notification_message = "Parcel delivery order {} accepted"
         elif status == "Delivered":
-            notification_message = "Parcel delivery order delivered"
+            notification_message = "Parcel delivery order {} delivered"
         elif status == "Canceled":
-            notification_message = "Parcel delivery order canceled"
+            notification_message = "Parcel delivery order {} canceled"
             user_id = 1
+        notification_message.format(order_id)
 
         query = """UPDATE orders SET status = '{}' WHERE order_id = {};""".format(status,
                                                                                   order_id)
@@ -113,10 +114,10 @@ class Orders(DataBase):
         """Changes order locations"""
         user_id = self.get_order(order_id)['user_id']
         if column == "current_location":
-            notification_message = "Current location of your parcel has been changed to {}".format(
+            notification_message = "Current location of parcel {} has been changed to {}".format(order_id,
                 location)
         elif column == "dest":
-            notification_message = "Destination location of your parcel has been changed to {}".format(
+            notification_message = "Destination location of parcel {} has been changed to {}".format(order_id,
                 location)
             user_id = 1
             
