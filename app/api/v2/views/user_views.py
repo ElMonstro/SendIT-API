@@ -26,10 +26,36 @@ class UserParcels(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        if user_data['user_id'] == int(id) or user_data['is_admin']:
+        if user_data['user_id'] == int_id or user_data['is_admin']:
             orders = self.orders.get_users_orders(int_id)
             if not orders:
                 return {message: 'No orders by that user'}, 404
             return {message: 'All user orders', 'orders': orders}
         # If user not admin or his/her id is not equal to the user id are  trying to access
         return message_dict, status_code
+
+
+class UsersNotifications(Resource):
+    """Handles the route /users/<user-id>/notifications"""
+    def __init__(self):
+        self.users = Users()
+
+    @authenticate
+    def get(self, id, user_data):
+        message_dict = {
+            message: 'You are not authorized to perform this operation'}
+        status_code = 403
+        try:
+            int_id = int(id)
+        except ValueError:
+            return {message: 'Wrong id format'}, 400
+
+        if user_data['user_id'] == int_id:
+            notifications = self.users.get_notifications(int_id)
+            if not notifications:
+                return {message: 'No unseen notifications for this user'}, 404
+            return {message: 'All user notifications fetched', 'notifications': notifications}
+        # If user not admin or his/her id is not equal to the user id are  trying to access
+        return message_dict, status_code
+
+
