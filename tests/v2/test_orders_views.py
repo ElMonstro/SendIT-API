@@ -25,7 +25,6 @@ class ParcelsTestCase(unittest.TestCase):
         response = self.client.post(
             'api/v2/auth/login', content_type="application/json", data=data)
         self.user_token_dict = {'token': json.loads(response.data)['token']}
-
         self.client.post('api/v2/parcels', data=json.dumps(self.order),
                          headers=self.user_token_dict, content_type="application/json")
 
@@ -85,6 +84,21 @@ class GoodRequestTestCase(ParcelsTestCase):
             'api/v2/users/2/parcels', headers=self.user_token_dict)
         data = json.loads(response.data)
         self.assertTrue('orders' in data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_all_notiications_by_user(self):
+        """Tests GET /users/<id>/notifications"""
+        # create order
+        last_rec = self.db_conn.get_last_record_id()
+        # Create notification
+        data = json.dumps({"curr_location": "Nairobi"})
+        response = self.client.put(
+            'api/v2/parcels/{}/PresentLocation'.format(last_rec), data=data, headers=self.admin_token_dict, content_type="application/json")
+        # Test with the right token
+        response = self.client.get(
+            'api/v2/users/2/notifications', headers=self.user_token_dict)
+        data = json.loads(response.data)
+        self.assertTrue('notifications' in data)
         self.assertEqual(response.status_code, 200)
 
     def test_get_specific_order(self):
@@ -307,6 +321,30 @@ class BadRequestTestCase(ParcelsTestCase):
             'api/v2/users/104/parcels', headers=self.admin_token_dict)
         data = json.loads(response.data)
         self.assertEqual(data, {'message': 'No orders by that user'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_all_user_notifications(self):
+        """Tests bad requests to GET /users/<id>/notifications"""
+        # Test with accessing other users notifications
+        response = self.client.get(
+            'api/v2/users/35530/notifications', headers=self.user_token_dict)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(json.loads(response.data), {
+                         'message': 'You are not authorized to perform this operation'})
+        # Test with wrong format user id
+        response = self.client.get(
+            'api/v2/users/35fsv530/notifications', headers=self.user_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(data, {'message': 'Wrong id format'})
+        # Mark all orders as seen
+        response = self.client.put(
+            'api/v2/users/2/notifications', headers=self.user_token_dict)        
+        # Test with user with no notifications
+        response = self.client.get(
+            'api/v2/users/2/notifications', headers=self.user_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(data, {'message': 'No unseen notifications for this user'})
         self.assertEqual(response.status_code, 404)
 
     def test_get_specific_order(self):
