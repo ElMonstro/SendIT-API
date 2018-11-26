@@ -5,6 +5,7 @@ import psycopg2
 from flask import current_app as app
 from app.api.v2.utils.validators import Validator
 from app.db_config import DbConnect
+from psycopg2.extras import RealDictCursor
 
 
 # Admin statuses
@@ -81,3 +82,23 @@ class Users(DataBase):
         self.cursor.execute(query)
         admin = self.cursor.fetchone()
         return admin[0]
+
+    def get_notifications(self, user_id):
+        """Gets a user's notification"""
+        query = """SELECT notification_id, order_id, message, created_on FROM notifications WHERE user_id = {} AND NOT is_seen;""".format(
+            user_id)
+        cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(query)
+        notifications = cursor.fetchall()
+        if notifications:
+            for notification in notifications:
+                notification['created_on'] = notification['created_on'].strftime("%Y-%m-%d %H:%M:%S") 
+        return notifications
+
+    def see_notification(self, notification_id):
+        """Changes notifications status to seen"""
+        query = """UPDATE orders SET is_seen = TRUE WHERE notification_id = {};""".format(
+            notification_id)
+        self.cursor.execute(query)
+        self.conn.commit()
+        
