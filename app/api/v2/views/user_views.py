@@ -37,6 +37,7 @@ class UserParcels(Resource):
 
 class UsersNotifications(Resource):
     """Handles the route /users/<user-id>/notifications"""
+
     def __init__(self):
         self.users = Users()
 
@@ -55,7 +56,20 @@ class UsersNotifications(Resource):
             if not notifications:
                 return {message: 'No unseen notifications for this user'}, 404
             return {message: 'All user notifications fetched', 'notifications': notifications}
-        # If user not admin or his/her id is not equal to the user id are  trying to access
         return message_dict, status_code
 
+    @authenticate
+    def put(self, id, user_data):
+        """Mark all users notifications as seen"""
+        message_dict = {
+            message: 'You are not authorized to perform this operation'}
+        status_code = 403
+        try:
+            int_id = int(id)
+        except ValueError:
+            return {message: 'Wrong id format'}, 400
 
+        if user_data['user_id'] == int_id:
+            self.users.see_all_notifications(int_id)
+            return {message: 'All notifications deleted'}
+        return message_dict, status_code
