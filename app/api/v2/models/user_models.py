@@ -97,8 +97,16 @@ class Users(DataBase):
 
     def see_notification(self, notification_id):
         """Changes notifications status to seen"""
-        query = """UPDATE orders SET is_seen = TRUE WHERE notification_id = {};""".format(
+        query = """UPDATE notifications SET is_seen = TRUE WHERE notification_id = {};""".format(
             notification_id)
         self.cursor.execute(query)
         self.conn.commit()
+
+    def see_all_notifications(self, user_id):
+        """Changes all users notifications seen status to true"""
+        query = """UPDATE notifications SET is_seen = TRUE WHERE user_id = {};""".format(
+            user_id)
+        self.cursor.execute(query)
+        self.conn.commit()
+
         
