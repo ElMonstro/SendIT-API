@@ -19,3 +19,5 @@ api.add_resource(ChangeDestLocation,
                  '/parcels/<id>/destination', strict_slashes=False)
 api.add_resource(UsersNotifications,
                  '/users/<id>/notifications', strict_slashes=False)
+api.add_resource(Notification,
+                 '/notifications/<id>', strict_slashes=False)
