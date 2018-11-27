@@ -88,7 +88,6 @@ class GoodRequestTestCase(ParcelsTestCase):
 
     def test_get_all_notiications_by_user(self):
         """Tests GET /users/<id>/notifications"""
-        # create order
         last_rec = self.db_conn.get_last_record_id()
         # Create notification
         data = json.dumps({"curr_location": "Nairobi"})
@@ -110,6 +109,21 @@ class GoodRequestTestCase(ParcelsTestCase):
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('order' in data)
+
+    def test_see_specific_notification(self):
+        """Tests GET /parcels/<id>"""
+        # Create notification
+        last_rec = self.db_conn.get_last_record_id("notifications")
+        data = json.dumps({"curr_location": "Nairobi"})
+        response = self.client.put(
+            'api/v2/parcels/{}/PresentLocation'.format(last_rec), data=data, headers=self.admin_token_dict, content_type="application/json")
+        # Test with right auth token
+        last_rec = self.db_conn.get_last_record_id("notifications")
+        response = self.client.put(
+            'api/v2/notifications/{}'.format(last_rec), headers=self.user_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['message'], 'Notification marked as seen')
 
     def test_change_curr_location(self):
         """Tests PUT /parcels/<id>/PresentLocation"""
@@ -339,12 +353,13 @@ class BadRequestTestCase(ParcelsTestCase):
         self.assertEqual(data, {'message': 'Wrong id format'})
         # Mark all orders as seen
         response = self.client.put(
-            'api/v2/users/2/notifications', headers=self.user_token_dict)        
+            'api/v2/users/2/notifications', headers=self.user_token_dict)
         # Test with user with no notifications
         response = self.client.get(
             'api/v2/users/2/notifications', headers=self.user_token_dict)
         data = json.loads(response.data)
-        self.assertEqual(data, {'message': 'No unseen notifications for this user'})
+        self.assertEqual(
+            data, {'message': 'No unseen notifications for this user'})
         self.assertEqual(response.status_code, 404)
 
     def test_get_specific_order(self):
