@@ -27,9 +27,13 @@ class DbConnect:
             pass
         self.conn.commit()
 
-    def get_last_record_id(self):
+    def get_last_record_id(self, table="orders"):
         """Retuns the last record id"""
-        query = """SELECT order_id FROM orders order by order_id desc limit 1;"""
+        if table == "orders":
+            primary_key = "order_id"
+        elif table == "notifications":
+            primary_key = "notification_id"
+        query = """SELECT {} FROM {} order by {} desc limit 1;""".format(primary_key, table, primary_key)
         self.cursor.execute(query)
         return self.cursor.fetchone()[0]
 
