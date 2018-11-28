@@ -21,3 +21,7 @@ api.add_resource(UsersNotifications,
                  '/users/<id>/notifications', strict_slashes=False)
 api.add_resource(Notification,
                  '/notifications/<id>', strict_slashes=False)
+api.add_resource(AcceptOrder, '/parcels/<id>/accept', strict_slashes=False)
+api.add_resource(RejectOrder, '/parcels/<id>/reject', strict_slashes=False)
+
+

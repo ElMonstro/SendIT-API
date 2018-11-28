@@ -41,16 +41,36 @@ class GoodRequestTestCase(ParcelsTestCase):
         self.assertEqual(json.loads(response.data)['message'], 'Order created')
         self.assertEqual(response.status_code, 201)
 
-    def test_admin_change_order_status(self):
+    def test_admin_deliver_order(self):
         """Tests PUT /parcels/<id>Cancel/"""
-        self.client.post('api/v2/parcels', data=json.dumps(self.order),
-                         headers=self.user_token_dict, content_type="application/json")
         # Test with the right auth token
         last_rec = self.db_conn.get_last_record_id()
         response = self.client.put(
             'api/v2/parcels/{}/deliver'.format(last_rec), headers=self.admin_token_dict)
         self.assertEqual(json.loads(response.data)[
                          'message'], 'Order delivered')
+        self.assertTrue('order' in json.loads(response.data))
+        self.assertEqual(response.status_code, 200)
+
+    def test_admin_accept_order(self):
+        """Tests PUT /parcels/<id>Cancel/"""
+        # Test with the right auth token
+        last_rec = self.db_conn.get_last_record_id()
+        response = self.client.put(
+            'api/v2/parcels/{}/accept'.format(last_rec), headers=self.admin_token_dict)
+        self.assertEqual(json.loads(response.data)[
+                         'message'], 'Order accepted')
+        self.assertTrue('order' in json.loads(response.data))
+        self.assertEqual(response.status_code, 200)
+
+    def test_admin_reject_order(self):
+        """Tests PUT /parcels/<id>Cancel/"""
+        # Test with the right auth token
+        last_rec = self.db_conn.get_last_record_id()
+        response = self.client.put(
+            'api/v2/parcels/{}/reject'.format(last_rec), headers=self.admin_token_dict)
+        self.assertEqual(json.loads(response.data)[
+                         'message'], 'Order rejected')
         self.assertTrue('order' in json.loads(response.data))
         self.assertEqual(response.status_code, 200)
 
@@ -188,7 +208,7 @@ class BadRequestTestCase(ParcelsTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data, {'message': 'Wrong id format'})
 
-    def test_admin_change_order_status(self):
+    def test_admin_deliver_order(self):
         """Tests bad requests to PUT /parcels/<id>"""
         # Test unregistered id
         # Correct format but not there
@@ -216,9 +236,61 @@ class BadRequestTestCase(ParcelsTestCase):
                          'message'], 'Unsuccesful, order already delivered')
         self.assertEqual(response.status_code, 400)
 
-    # def test_get_all_orders(self):
-      #  """Tests bad requests to GET /parcels"""
-       # pass
+    def test_admin_accept_order(self):
+        """Tests bad requests to PUT /parcels/<id>/accept"""
+        # Test unregistered id
+        # Correct format but not there
+        response = self.client.put(
+            'api/v2/parcels/35420/accept', headers=self.admin_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            data, {'message': 'No Parcel delivery order with that id'})
+        # Test invalid format id
+        response = self.client.put(
+            'api/v2/parcels/35uh420/accept', headers=self.admin_token_dict)  # Incorrect id format
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(data, {'message': 'Wrong id format'})
+        # test with delivered parcel
+        self.client.post('api/v2/parcels', data=json.dumps(self.order),
+                         headers=self.user_token_dict, content_type="application/json")
+        last_rec = self.db_conn.get_last_record_id()
+        self.client.put(
+            'api/v2/parcels/{}/deliver'.format(last_rec), headers=self.admin_token_dict)
+        response = self.client.put(
+            'api/v2/parcels/{}/accept'.format(last_rec), headers=self.admin_token_dict)
+        self.assertEqual(json.loads(response.data)[
+                         'message'], 'Unsuccesful, order already delivered')
+        self.assertEqual(response.status_code, 400)
+
+    def test_admin_reject_order(self):
+        """Tests bad requests to PUT /parcels/<id>/reject"""
+        # Test unregistered id
+        # Correct format but not there
+        response = self.client.put(
+            'api/v2/parcels/35420/reject', headers=self.admin_token_dict)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            data, {'message': 'No Parcel delivery order with that id'})
+        # Test invalid format id
+        response = self.client.put(
+            'api/v2/parcels/35uh420/reject', headers=self.admin_token_dict)  # Incorrect id format
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(data, {'message': 'Wrong id format'})
+        # test with delivered parcel
+        self.client.post('api/v2/parcels', data=json.dumps(self.order),
+                         headers=self.user_token_dict, content_type="application/json")
+        last_rec = self.db_conn.get_last_record_id()
+        self.client.put(
+            'api/v2/parcels/{}/deliver'.format(last_rec), headers=self.admin_token_dict)
+        response = self.client.put(
+            'api/v2/parcels/{}/reject'.format(last_rec), headers=self.admin_token_dict)
+        self.assertEqual(json.loads(response.data)[
+                         'message'], 'Unsuccesful, order already delivered')
+        self.assertEqual(response.status_code, 400)
 
     def test_change_curr_location(self):
         """Tests PUT requests to api/v2/parcels/<id>/PresentLocation """
