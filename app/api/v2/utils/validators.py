@@ -93,6 +93,8 @@ class Validator:
             return 'Unsuccesful, order already delivered'
         if status == 'Canceled':
             return 'Unsuccessful, order is canceled'
+        if status == 'Rejected':
+            return 'Unsuccessful, order is rejected'
         return True
 
     def validate_order_data(self, order):
