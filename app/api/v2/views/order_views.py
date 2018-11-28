@@ -117,6 +117,78 @@ class CancelOrder(Resource):
         return message_dict, status_code
 
 
+class AcceptOrder(Resource):
+    """Handle the route /parcels/<id>/deliver"""
+
+    def __init__(self):
+        self.orders = Orders()
+        self.validators = Validator()
+
+    @authenticate
+    def put(self, id, user_data):
+        """Handle put requests to route /parcels/<id>/deliver"""
+        message_dict = {}
+        status_code = 200
+        if not user_data['is_admin']:
+            return {message: 'You are not authorized to perform this operation'}, 403
+        try:
+            int_id = int(id)
+        except ValueError:
+            return {message: 'Wrong id format'}, 400
+
+        order = self.orders.get_order(int_id)
+
+        if order:
+            status = order['status']
+            error_message = self.validators.status_validator(status)
+            if error_message == True:
+                self.orders.change_order_status(
+                    order_id=int_id, status=in_transit)
+                order_d = self.orders.get_order(int_id)
+                message_dict = {message: 'Order accepted', 'order': order_d}
+            else:
+                return {message: error_message}, 400
+        else:
+            message_dict = {message: 'No Parcel delivery order with that id'}
+            status_code = 404
+        return message_dict, status_code
+
+class RejectOrder(Resource):
+    """Handle the route /parcels/<id>/deliver"""
+
+    def __init__(self):
+        self.orders = Orders()
+        self.validators = Validator()
+
+    @authenticate
+    def put(self, id, user_data):
+        """Handle put requests to route /parcels/<id>/deliver"""
+        message_dict = {}
+        status_code = 200
+        if not user_data['is_admin']:
+            return {message: 'You are not authorized to perform this operation'}, 403
+        try:
+            int_id = int(id)
+        except ValueError:
+            return {message: 'Wrong id format'}, 400
+
+        order = self.orders.get_order(int_id)
+
+        if order:
+            status = order['status']
+            error_message = self.validators.status_validator(status)
+            if error_message == True:
+                self.orders.change_order_status(
+                    order_id=int_id, status=rejected)
+                order_d = self.orders.get_order(int_id)
+                message_dict = {message: 'Order rejected', 'order': order_d}
+            else:
+                return {message: error_message}, 400
+        else:
+            message_dict = {message: 'No Parcel delivery order with that id'}
+            status_code = 404
+        return message_dict, status_code
+
 class DeliverOrder(Resource):
     """Handle the route /parcels/<id>/deliver"""
 
