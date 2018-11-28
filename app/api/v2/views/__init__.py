@@ -1,3 +1,3 @@
-from .order_views import Parcel, Parcels, CancelOrder, DeliverOrder, ChangeCurrentLocation, ChangeDestLocation
-from .auth_views import Login, Register
-from .user_views import UserParcels
+from .order_views import *
+from .auth_views import *
+from .user_views import *

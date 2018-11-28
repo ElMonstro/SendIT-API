@@ -27,9 +27,13 @@ class DbConnect:
             pass
         self.conn.commit()
 
-    def get_last_record_id(self):
+    def get_last_record_id(self, table="orders"):
         """Retuns the last record id"""
-        query = """SELECT order_id FROM orders order by order_id desc limit 1;"""
+        if table == "orders":
+            primary_key = "order_id"
+        elif table == "notifications":
+            primary_key = "notification_id"
+        query = """SELECT {} FROM {} order by {} desc limit 1;""".format(primary_key, table, primary_key)
         self.cursor.execute(query)
         return self.cursor.fetchone()[0]
 
@@ -87,7 +91,7 @@ def create_queries():
         notification_id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users,
         order_id INTEGER REFERENCES orders ON DELETE SET NULL,
-        message VARCHAR (50) NOT NULL,
+        message VARCHAR (100) NOT NULL,
         is_seen BOOL DEFAULT FALSE,
         created_on TIMESTAMP DEFAULT NOW()
         );"""
@@ -100,3 +104,4 @@ def create_queries():
                 VALUES ('dan', '{}', 'dan@gmail.com', False);""".format(password)
 
     return [user_table, order_table, notifications, create_admin, create_user]
+

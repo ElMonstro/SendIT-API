@@ -9,6 +9,12 @@ from app.api.v2.utils.auth_decorator import authenticate
 from app.api.v2.utils.validators import Validator
 
 message = 'message'
+canceled = "Canceled"
+rejected = "Rejected"
+delivered = "Delivered"
+in_transit = "In-transit"
+current_location = "current_location"
+dest = "dest"
 
 
 class Parcels(Resource):
@@ -77,6 +83,7 @@ class CancelOrder(Resource):
 
     def __init__(self):
         self.orders = Orders()
+        self.validators = Validator()
 
     @authenticate
     def put(self, id, user_data):
@@ -90,16 +97,20 @@ class CancelOrder(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        status = self.orders.get_order_status(int_id)
+        order = self.orders.get_order(int_id)
 
-        if status:
-            if status == 'Delivered':
-                return {message: 'Unsuccesful, order already delivered'}, 400
-            if status == 'Canceled':
-                return {message: 'Unsuccessful, order is canceled'}, 400
-            self.orders.cancel_order(int_id, user_data['user_id'])
-            order_d = self.orders.get_order(int_id)
-            message_dict = {message: 'Order canceled', 'order': order_d}
+        if order:
+            if not order['user_id'] == user_data['user_id']:
+                return {message: 'You are not authorized to perform this operation'}, 403
+            status = order['status']
+            error_message = self.validators.status_validator(status)
+            if error_message == True:
+                self.orders.change_order_status(
+                    order_id=int_id, status=canceled)
+                order_d = self.orders.get_order(int_id)
+                message_dict = {message: 'Order canceled', 'order': order_d}
+            else:
+                return {message: error_message}, 400
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 404
@@ -125,16 +136,18 @@ class DeliverOrder(Resource):
         except ValueError:
             return {message: 'Wrong id format'}, 400
 
-        status = self.orders.get_order_status(int_id)
+        order = self.orders.get_order(int_id)
 
-        if status:
-            response = self.validators.status_validator(status)
-            if response == True:
-                self.orders.deliver_order(user_data['user_id'], int_id)
+        if order:
+            status = order['status']
+            error_message = self.validators.status_validator(status)
+            if error_message == True:
+                self.orders.change_order_status(
+                    order_id=int_id, status=delivered)
                 order_d = self.orders.get_order(int_id)
-                message_dict = {message: 'Status changed', 'order': order_d}
+                message_dict = {message: 'Order delivered', 'order': order_d}
             else:
-                return {message: response}, 403
+                return {message: error_message}, 400
         else:
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 404
@@ -168,13 +181,14 @@ class ChangeCurrentLocation(Resource):
         except TypeError:
             return {message: 'Current Location must be in an object'}, 400
 
-        status = self.orders.get_order_status(int_id)
+        order = self.orders.get_order(int_id)
 
-        if status:
+        if order:
+            status = order['status']
             response = self.validators.status_validator(status)
             if response == True:
-                self.orders.change_current_loc(
-                    user_data['user_id'], int_id, curr_loc)
+                self.orders.change_location(
+                    order_id=int_id, location=curr_loc, column=current_location)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {
                     message: 'Present location changed', 'order': order_d}
@@ -214,13 +228,14 @@ class ChangeDestLocation(Resource):
         except TypeError:
             return {message: 'Destination Location must be in an object'}, 400
 
-        status = self.orders.get_order_status(int_id)
+        order = self.orders.get_order(int_id)
 
-        if status:
+        if order:
+            status = order['status']
             response = self.validators.status_validator(status)
             if response == True:
-                self.orders.change_dest_loc(
-                    user_data['user_id'], int_id, dest_loc)
+                self.orders.change_location(
+                    order_id=int_id, location=dest_loc, column=dest)
                 order_d = self.orders.get_order(int_id)
                 message_dict = {
                     message: 'Destination location changed', 'order': order_d}
