@@ -82,7 +82,7 @@ def create_queries():
         current_location VARCHAR (50),
         dest VARCHAR (50) NOT NULL,
         weight INTEGER NOT NULL,
-        status VARCHAR (12) DEFAULT 'In-transit',
+        status VARCHAR (12) DEFAULT 'Pending',
         created_on TIMESTAMP DEFAULT NOW()
         );"""
 
