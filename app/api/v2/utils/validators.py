@@ -111,10 +111,10 @@ class Validator:
             resp_list.append('pickup location must be a string')
         if not isinstance(order['dest'], str):
             resp_list.append('destination location must be a string')
-        if not order['pickup']:
-            resp_list.append("pickup cannot be blank")
-        if not order['dest']:
-            resp_list.append("destination cannot be blank")
+        if not re.search('[A-Za-z]', str(order['pickup'])):
+            resp_list.append("pickup must have letters")
+        if not re.search('[A-Za-z]', str(order['dest'])):
+            resp_list.append("destination must have letters")
         if not len(str(order['recepient_no'])) == 9:
             resp_list.append('phone number must have nine digits')
         if len(str(order['recepient_name'])) < 3:
