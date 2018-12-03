@@ -41,9 +41,8 @@ bad_data_types = {
 }
 
 bad_data_types_r ={
-    "message": "Unsuccessful, recepient number must be an integer, recepient name must be a string, pickup location must be a string, destination location must be a string, phone number must have nine digits, receipient name must be in letters"
+    "message": "Unsuccessful, recepient number must be an integer, recepient name must be a string, pickup location must be a string, destination location must be a string, pickup must have letters, destination must have letters, phone number must have nine digits, receipient name must be in letters"
 }
-
 
 user_register = {
     'username': 'Eminem',
@@ -64,9 +63,8 @@ bad_email_user_register = {
 }
 
 invalid_data_r ={
-    "message": "Unsuccessful, weight must be an integer, pickup cannot be blank, destination cannot be blank, phone number must have nine digits"
+    "message": "Unsuccessful, weight must be an integer, pickup must have letters, destination must have letters, phone number must have nine digits"
 }
-
 bad_keys_response = {
     "message": "Unsuccessful, the object must have a 'dest' key, the object must have a 'pickup' key, the object must have a 'weight' key, the object must have a 'recepient_name' key, the object must have a 'recepient_no' key"
 }
