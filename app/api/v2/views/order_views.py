@@ -256,7 +256,7 @@ class ChangeCurrentLocation(Resource):
             return {message: 'curr_location key not in object'}, 400
         except TypeError:
             return {message: 'Current Location must be in an object'}, 400
-        if not re.search('[A-Za-z]', str(data['cur_location'])) or not str(data['curr_location']).isalpha():
+        if not re.search('[A-Za-z]', str(data['curr_location'])):
             return {message: 'Present location must be in alphabetic letters'}, 400
         order = self.orders.get_order(int_id)
 
@@ -305,7 +305,6 @@ class ChangeDestLocation(Resource):
         except TypeError:
             return {message: 'Destination Location must be in an object'}, 400
 
-        # or not str(data['dest_location']).isalpha():
         if not re.search('[A-Za-z]', str(data['dest_location'])):
             return {message: 'Destination location must be in alphabetic letters'}, 400
 
