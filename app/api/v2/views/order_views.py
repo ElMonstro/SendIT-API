@@ -1,3 +1,4 @@
+import re
 from flask import request
 from flask_restful import Resource
 from app.api.v2.models.order_models import Orders
@@ -7,6 +8,7 @@ from instance.config import DevelopmentConfig
 from functools import wraps
 from app.api.v2.utils.auth_decorator import authenticate
 from app.api.v2.utils.validators import Validator
+
 
 message = 'message'
 canceled = "Canceled"
@@ -153,6 +155,7 @@ class AcceptOrder(Resource):
             status_code = 404
         return message_dict, status_code
 
+
 class RejectOrder(Resource):
     """Handle the route /parcels/<id>/deliver"""
 
@@ -188,6 +191,7 @@ class RejectOrder(Resource):
             message_dict = {message: 'No Parcel delivery order with that id'}
             status_code = 404
         return message_dict, status_code
+
 
 class DeliverOrder(Resource):
     """Handle the route /parcels/<id>/deliver"""
@@ -252,7 +256,8 @@ class ChangeCurrentLocation(Resource):
             return {message: 'curr_location key not in object'}, 400
         except TypeError:
             return {message: 'Current Location must be in an object'}, 400
-
+        if not re.search('[A-Za-z]', str(data['cur_location'])) or not str(data['curr_location']).isalpha():
+            return {message: 'Present location must be in alphabetic letters'}, 400
         order = self.orders.get_order(int_id)
 
         if order:
@@ -299,6 +304,10 @@ class ChangeDestLocation(Resource):
             return {message: 'dest_location key not in object'}, 400
         except TypeError:
             return {message: 'Destination Location must be in an object'}, 400
+
+        # or not str(data['dest_location']).isalpha():
+        if not re.search('[A-Za-z]', str(data['dest_location'])):
+            return {message: 'Destination location must be in alphabetic letters'}, 400
 
         order = self.orders.get_order(int_id)
 
