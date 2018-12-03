@@ -165,7 +165,7 @@ class GoodRequestTestCase(ParcelsTestCase):
         self.client.post('api/v2/parcels/', data=json.dumps(self.order),
                          headers=self.user_token_dict, content_type="application/json")
         last_rec = self.db_conn.get_last_record_id()
-        data = json.dumps({"dest_location": "12345678"})
+        data = json.dumps({"dest_location": "Nairobi"})
         response = self.client.put(
             'api/v2/parcels/{}/destination'.format(last_rec), data=data, headers=self.user_token_dict, content_type="application/json")
         self.assertEqual(json.loads(response.data)[
@@ -327,7 +327,7 @@ class BadRequestTestCase(ParcelsTestCase):
         # Test for orders already delivered
         self.client.put(
             'api/v2/parcels/{}/deliver'.format(last_rec), headers=self.admin_token_dict)
-        data = json.dumps({"curr_location": "12345678"})
+        data = json.dumps({"curr_location": "Nairobi"})
         response = self.client.put(
             'api/v2/parcels/{}/PresentLocation'.format(last_rec), data=data, headers=self.admin_token_dict, content_type="application/json")
         self.assertEqual(json.loads(response.data)[
@@ -375,7 +375,7 @@ class BadRequestTestCase(ParcelsTestCase):
         # Test for orders already delivered
         self.client.put(
             'api/v2/parcels/{}/deliver'.format(last_rec), headers=self.admin_token_dict)
-        data = json.dumps({"dest_location": "12345678"})
+        data = json.dumps({"dest_location": "Nairobi"})
         response = self.client.put(
             'api/v2/parcels/{}/destination'.format(last_rec), data=data, headers=self.user_token_dict, content_type="application/json")
         self.assertEqual(json.loads(response.data)[
