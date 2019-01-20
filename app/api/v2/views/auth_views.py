@@ -53,7 +53,9 @@ class Login(Resource):
                 payload = {'user_id': user_id[0], 'exp': exp}
                 token = jwt.encode(payload, key=secret, )
                 return { message: 'Login successful',
-                    'token': token.decode('utf-8',)}
+                    'token': token.decode('utf-8',),
+                    'user_id': user_id[0],
+                    'is_admin': self.users.is_admin(user_id[0])}
             # If password not valid
             message_dict = {message: 'Invalid password'}
             status_code = 401
