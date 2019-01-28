@@ -116,7 +116,7 @@ class Orders(DataBase):
             notification_message = "The current location of parcel number {} is {}".format(order_id,
                 location)
         elif column == "dest":
-            notification_message = "Destination location of parcel number {} has been changed to {}".format(order_id,
+            notification_message = "New destination location of parcel number {} is {}".format(order_id,
                 location)
             user_id = 1
             
