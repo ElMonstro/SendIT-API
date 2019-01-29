@@ -98,7 +98,7 @@ class Orders(DataBase):
             notification_message = "Parcel delivery order number {} delivered".format(order_id)
         elif status == "Canceled":
             notification_message = "Parcel delivery order number {} canceled".format(order_id)
-            user_id = 1
+            user_id = 2
 
         query = """UPDATE orders SET status = '{}' WHERE order_id = {};""".format(status,
                                                                                   order_id)
@@ -118,7 +118,7 @@ class Orders(DataBase):
         elif column == "dest":
             notification_message = "New destination location of parcel number {} is {}".format(order_id,
                 location)
-            user_id = 1
+            user_id = 2
             
         """Updates current parcel location"""
         query = """UPDATE orders SET {} = '{}' where order_id = {};""".format(column,

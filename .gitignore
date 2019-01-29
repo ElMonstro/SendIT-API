@@ -105,3 +105,4 @@ venv.bak/
 # vscode
 .vscode/
 python_playground.py
+node_modules/

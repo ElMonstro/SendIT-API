@@ -1,4 +1,4 @@
-import os
+from flask_cors import CORS
 from app.api.v1 import v1
 from app.api.v2 import v2
 from flask import Flask
@@ -8,6 +8,7 @@ from .db_config import DbConnect
 
 def create_app(config='dev'):
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(config_dict[config])
     db_conn = DbConnect(config)
     db_conn.create_tables()
