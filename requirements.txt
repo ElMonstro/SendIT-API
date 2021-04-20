@@ -27,7 +27,7 @@ mccabe==0.6.1
 more-itertools==4.3.0
 pluggy==0.8.0
 psycopg2-binary==2.7.6
-py==1.7.0
+py==1.10.0
 py3dns==3.2.0
 pycodestyle==2.4.0
 pycparser==2.19
