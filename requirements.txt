@@ -8,7 +8,7 @@ certifi==2018.10.15
 cffi==1.11.5
 chardet==3.0.4
 Click==7.0
-codecov==2.0.15
+codecov==2.0.16
 coverage==4.5.1
 coveralls==1.5.1
 cryptography==2.3.1
